@@ -285,10 +285,15 @@ app:
       extrude_length: Extrude Length
       extrude_speed: Extrude Speed
       filament: Filament
+      filaments: Filaments
       file: File
       finish_time: Finish
       flow: Flow
       free: free
+      loaded: Loaded
+      empty: Empty
+      auto_replenish: Auto Replenish
+      entangle_detect: Entangle Detection
       heaters_busy: >-
         The printer is currently busy. Turning off the heaters may result in a
         failed print.
@@ -375,6 +380,7 @@ app:
     msg:
       password_changed: Password changed
       wrong_password: Oops, something went wrong. Is your password correct?
+      no_filaments: No filament information available
       bed_screws_adjust: >-
         Click <b>Adjusted</b> if a significant adjustment is necessary on the current screw; otherwise, click <b>Accept</b> to continue.
       welcome_back: >-

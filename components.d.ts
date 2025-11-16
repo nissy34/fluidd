@@ -79,6 +79,7 @@ declare module 'vue' {
     VAlert: typeof import('vuetify/lib')['VAlert']
     VApp: typeof import('vuetify/lib')['VApp']
     VAppBar: typeof import('vuetify/lib')['VAppBar']
+    VAvatar: typeof import('vuetify/lib')['VAvatar']
     VBadge: typeof import('vuetify/lib')['VBadge']
     VBtn: typeof import('vuetify/lib')['VBtn']
     VBtnToggle: typeof import('vuetify/lib')['VBtnToggle']

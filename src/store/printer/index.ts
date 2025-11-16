@@ -3,6 +3,7 @@ import { state } from './state'
 import { getters } from './getters'
 import { actions } from './actions'
 import { mutations } from './mutations'
+import { filaments } from './filaments'
 import type { PrinterState } from './types'
 import type { RootState } from '../types'
 
@@ -13,5 +14,8 @@ export const printer = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
+  modules: {
+    filaments
+  }
 } satisfies Module<PrinterState, RootState>

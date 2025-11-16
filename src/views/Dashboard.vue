@@ -57,6 +57,7 @@ import MmuCard from '@/components/widgets/mmu/MmuCard.vue'
 import SensorsCard from '@/components/widgets/sensors/SensorsCard.vue'
 import RunoutSensorsCard from '@/components/widgets/runout-sensors/RunoutSensorsCard.vue'
 import BeaconCard from '@/components/widgets/beacon/BeaconCard.vue'
+import FilamentManager from '@/components/widgets/filaments/FilamentManager.vue'
 import type { KlipperPrinterSettings } from '@/store/printer/types'
 
 @Component({
@@ -78,7 +79,8 @@ import type { KlipperPrinterSettings } from '@/store/printer/types'
     MmuCard,
     SensorsCard,
     RunoutSensorsCard,
-    BeaconCard
+    BeaconCard,
+    FilamentManager
   }
 })
 export default class Dashboard extends Mixins(StateMixin) {
@@ -149,6 +151,12 @@ export default class Dashboard extends Mixins(StateMixin) {
 
   get supportsMmu (): boolean {
     return this.$typedState.printer.printer.mmu != null
+  }
+
+  get supportsFilaments (): boolean {
+    // For now, always show filaments widget
+    // Later, can add check for printer capability
+    return true
   }
 
   get hasMacros (): boolean {
@@ -226,6 +234,7 @@ export default class Dashboard extends Mixins(StateMixin) {
     if (item.id === 'mmu-card' && !this.supportsMmu) return true
     if (item.id === 'sensors-card' && !this.hasSensors) return true
     if (item.id === 'temperature-card' && !this.hasHeatersOrTemperatureSensors) return true
+    if (item.id === 'filament-manager' && !this.supportsFilaments) return true
 
     // Otherwise return the opposite of whatever the enabled state is.
     return !item.enabled

@@ -48,10 +48,16 @@ export const httpClientActions = {
       result: {
         username: string,
         token: string,
+        refresh_token: string,
         action: 'user_jwt_refresh',
         source: string
       }
     }>('/access/refresh_jwt', { refresh_token }, options)
+  },
+
+  serverFilesGetPrintTask (options?: AxiosRequestConfig) {
+    const timestamp = new Date().getTime()
+    return this.get<any>(`/server/files/config/snapmaker/print_task.json?date=${timestamp}`, options)
   },
 
   accessLoginPost (username: string, password: string, source: string = 'moonraker', options?: AxiosRequestConfig) {
