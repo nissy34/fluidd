@@ -3,6 +3,7 @@ import { Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator'
 import type { WebcamConfig } from '@/store/webcams/types'
 import { consola } from 'consola'
 import type { CameraConnectionStatus, CameraNameMenuItem } from '@/types'
+import { SocketActions } from '@/api/socketActions'
 
 @Component
 export default class CameraMixin extends Vue {
@@ -108,13 +109,16 @@ export default class CameraMixin extends Vue {
     this.animating = false
     document.removeEventListener('visibilitychange', this.checkPlayback)
     this.stopPlayback()
+    SocketActions.cameraStopMonitor()
   }
 
   checkPlayback () {
     if (!document.hidden) {
+      SocketActions.cameraStartMonitor()
       this.startPlayback()
     } else {
       this.stopPlayback()
+      SocketActions.cameraStopMonitor()
     }
   }
 

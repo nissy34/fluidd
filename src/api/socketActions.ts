@@ -14,6 +14,24 @@ const baseEmit = (method: string, options: NotifyOptions) => {
 }
 
 export const SocketActions = {
+  async cameraStartMonitor (options?: NotifyOptions) {
+    baseEmit(
+      'camera.start_monitor', {
+        dispatch: 'void',
+        ...options,
+        params: { domain: 'lan', interval: 0 }
+      }
+    )
+  },
+  async cameraStopMonitor (options?: NotifyOptions) {
+    baseEmit(
+      'camera.stop_monitor', {
+        dispatch: 'void',
+        ...options,
+        params: { domain: 'lan' }
+      }
+    )
+  },
   async machineServicesRestart (service: string, options?: NotifyOptions) {
     baseEmit(
       'machine.services.restart', {

@@ -261,5 +261,10 @@ export const actions = {
 
   async notifySpoolmanStatusChanged ({ dispatch }, payload) {
     dispatch('spoolman/onStatusChanged', payload.spoolman_connected, { root: true })
+  },
+
+  async notifyCameraStatusChange () {
+    // Camera status change notification - no action needed
+    consola.debug('Camera status changed')
   }
 } satisfies ActionTree<SocketState, RootState>
