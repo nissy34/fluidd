@@ -4,22 +4,26 @@
       :title="$t('app.general.label.filaments')"
       icon="$filament"
       draggable
-      layout-path="dashboard.filament-card"
+      layout-path="dashboard.filament-manager"
     >
       <template #menu>
-        <app-btn
-          small
-          class="me-1 my-1"
-          @click="refreshFilamentData"
-        >
-          <v-icon
-            small
-            left
-          >
-            $refresh
-          </v-icon>
-          {{ $t('app.general.btn.refresh') }}
-        </app-btn>
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <app-btn
+              v-bind="attrs"
+              small
+              icon
+              class="me-1 my-1"
+              @click="refreshFilamentData"
+              v-on="on"
+            >
+              <v-icon small>
+                $refresh
+              </v-icon>
+            </app-btn>
+          </template>
+          <span>{{ $t('app.general.btn.refresh') }}</span>
+        </v-tooltip>
       </template>
 
       <v-card-text>
