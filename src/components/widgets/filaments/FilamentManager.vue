@@ -31,13 +31,16 @@
           v-if="filamentSlots.length > 0"
           fluid
         >
-          <v-row>
+          <v-row
+            dense
+            justify="center"
+            class="filament-slots-row"
+          >
             <v-col
               v-for="slot in filamentSlots"
               :key="slot.index"
-              cols="12"
-              sm="6"
-              md="3"
+              cols="auto"
+              class="d-flex justify-center filament-slot-col"
             >
               <filament-slot
                 :filament-slot="slot"
@@ -206,5 +209,21 @@ export default class FilamentManager extends Vue {
   lang="scss"
   scoped
 >
-  // Additional styles if needed
+.filament-slots-row {
+  margin: 0 -12px;
+}
+
+.filament-slot-col {
+  padding: 12px !important;
+}
+
+@media (max-width: 960px) {
+  .filament-slots-row {
+    margin: 0 -4px;
+  }
+
+  .filament-slot-col {
+    padding: 4px !important;
+  }
+}
 </style>

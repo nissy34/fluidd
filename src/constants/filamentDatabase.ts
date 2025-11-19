@@ -236,11 +236,16 @@ export const FILAMENT_DATABASE: FilamentDatabase = {
  * Get formatted display name: "Vendor: Serie Material" or "Vendor: Material"
  * Examples: "Polymaker: Sonic PLA", "Snapmaker: PLA", "Generic: Silk PLA"
  */
-export function getFilamentDisplayName (vendor: string, serie: string, material: string): string {
+export function getFilamentDisplayName (vendor: string, serie: string): string {
+  // if (serie && serie.trim()) {
+  //   return `${vendor}: ${serie} ${material}`
+  // }
+  // return `${vendor}: ${material}`
+
   if (serie && serie.trim()) {
-    return `${vendor}: ${serie} ${material}`
+    return `${vendor} ${serie}`
   }
-  return `${vendor}: ${material}`
+  return `${vendor}`
 }
 
 /**
@@ -250,7 +255,7 @@ export function formatFilamentSlot (vendor: string | null, subType: string | nul
   if (!vendor || !type) {
     return 'Unknown'
   }
-  return getFilamentDisplayName(vendor, subType || '', type)
+  return getFilamentDisplayName(vendor, subType || '')
 }
 
 /**
