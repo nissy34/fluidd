@@ -12,6 +12,14 @@ export interface FilamentSlot {
   editable: boolean
 }
 
+export interface ReprintInfo {
+  auto_bed_leveling: boolean
+  flow_calibrate: boolean
+  time_lapse_camera: boolean
+  extruder_map_table: number[]
+  extruders_used: boolean[]
+}
+
 export interface FilamentState {
   slots: FilamentSlot[]
   extruderMapTable: number[]
@@ -23,6 +31,8 @@ export interface FilamentState {
   autoBedLeveling: boolean
   flowCalibrate: boolean
   shaperCalibrate: boolean
+  reprintInfo: ReprintInfo | null
+  rawData: Record<string, any>
 }
 
 export interface PrintTaskData {
@@ -45,4 +55,5 @@ export interface PrintTaskData {
   shaper_calibrate: boolean
   auto_replenish_filament: boolean
   filament_entangle_detect: boolean
+  reprint_info?: ReprintInfo
 }

@@ -19,15 +19,26 @@
             <v-list-item
               v-if="canPrint"
               :disabled="!printerReady"
+              @click="$emit('configure-print', file)"
+            >
+              <v-list-item-icon>
+                <v-icon> $cog </v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>{{ $t("app.general.btn.configure_print") }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+              v-if="canPrint"
+              :disabled="!printerReady"
               @click="$emit('print', file)"
             >
               <v-list-item-icon>
-                <v-icon>
-                  $printer
-                </v-icon>
+                <v-icon> $printer </v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.print') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.print") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -49,12 +60,10 @@
               @click="$emit('preheat', file)"
             >
               <v-list-item-icon>
-                <v-icon>
-                  $fire
-                </v-icon>
+                <v-icon> $fire </v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.preheat') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.preheat") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -66,7 +75,7 @@
                 <v-icon>$open</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.view') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.view") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -78,7 +87,7 @@
                 <v-icon>$pencil</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.edit') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.edit") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -90,7 +99,7 @@
                 <v-icon>$sync</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.refresh_metadata') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.refresh_metadata") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -102,7 +111,11 @@
                 <v-icon>$stopwatch</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.perform_time_analysis') }}</v-list-item-title>
+                <v-list-item-title>
+                  {{
+                    $t("app.general.btn.perform_time_analysis")
+                  }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -114,7 +127,7 @@
                 <v-icon>$cubeScan</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.preview_gcode') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.preview_gcode") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -126,7 +139,11 @@
                 <v-icon>$fileZipAdd</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.create_zip_archive') }}</v-list-item-title>
+                <v-list-item-title>
+                  {{
+                    $t("app.general.btn.create_zip_archive")
+                  }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -138,7 +155,7 @@
                 <v-icon>$download</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.download') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.download") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -150,7 +167,7 @@
                 <v-icon>$rename</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.rename') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.rename") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -162,7 +179,7 @@
                 <v-icon>$duplicate</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.duplicate') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.duplicate") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -174,7 +191,7 @@
                 <v-icon>$delete</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('app.general.btn.remove') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("app.general.btn.remove") }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -244,10 +261,7 @@ export default class FileSystemContextMenu extends Mixins(StateMixin, FilesMixin
     return (
       !Array.isArray(this.file) &&
       this.file.type !== 'directory' &&
-      (
-        this.file.permissions === undefined ||
-        this.file.permissions.includes('r')
-      )
+      (this.file.permissions === undefined || this.file.permissions.includes('r'))
     )
   }
 
@@ -256,10 +270,7 @@ export default class FileSystemContextMenu extends Mixins(StateMixin, FilesMixin
       !Array.isArray(this.file) &&
       this.file.type !== 'directory' &&
       this.rootProperties.canView.includes(this.file.extension) &&
-      (
-        this.file.permissions === undefined ||
-        this.file.permissions.includes('r')
-      )
+      (this.file.permissions === undefined || this.file.permissions.includes('r'))
     )
   }
 
@@ -273,11 +284,7 @@ export default class FileSystemContextMenu extends Mixins(StateMixin, FilesMixin
   }
 
   get printerReady () {
-    return (
-      !this.printerPrinting &&
-      !this.printerPaused &&
-      this.klippyReady
-    )
+    return !this.printerPrinting && !this.printerPaused && this.klippyReady
   }
 
   get canPreviewGcode () {
@@ -291,11 +298,7 @@ export default class FileSystemContextMenu extends Mixins(StateMixin, FilesMixin
 
   get canCreateZip (): boolean {
     return (
-      (
-        Array.isArray(this.file) ||
-        this.file.type !== 'file' ||
-        this.file.extension !== '.zip'
-      ) &&
+      (Array.isArray(this.file) || this.file.type !== 'file' || this.file.extension !== '.zip') &&
       !this.rootProperties.readonly &&
       this.$typedGetters['server/getIsMinApiVersion']('1.1.0')
     )
@@ -306,10 +309,7 @@ export default class FileSystemContextMenu extends Mixins(StateMixin, FilesMixin
 
     return (
       this.root === 'gcodes' &&
-      files.some(x =>
-        x.type !== 'directory' &&
-        this.rootProperties.accepts.includes(x.extension)
-      )
+      files.some((x) => x.type !== 'directory' && this.rootProperties.accepts.includes(x.extension))
     )
   }
 
@@ -321,9 +321,7 @@ export default class FileSystemContextMenu extends Mixins(StateMixin, FilesMixin
   }
 
   get canRefreshMetadata (): boolean {
-    return (
-      this.isGcodesRootWithAcceptedFiles
-    )
+    return this.isGcodesRootWithAcceptedFiles
   }
 
   get canPerformTimeAnalysys (): boolean {

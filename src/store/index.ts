@@ -31,6 +31,7 @@ import { mmu } from './mmu'
 import { sensors } from './sensors'
 import { database } from './database'
 import { analysis } from './analysis'
+import { printJob } from './printJob'
 
 Vue.use(Vuex)
 
@@ -62,7 +63,8 @@ export const storeOptions = {
     mmu,
     sensors,
     database,
-    analysis
+    analysis,
+    printJob
   } satisfies RootModules,
   mutations: {},
   actions: {

@@ -181,6 +181,13 @@ export const actions = {
     SocketActions.printerObjectsSubscribe(intendedSubscriptions)
   },
 
+  async onPrinterObjectsQuery ({ dispatch }, payload: { status: any }) {
+    // Handle explicit query responses for print_task_config
+    if (payload.status?.print_task_config) {
+      await dispatch('filaments/onPrintTaskConfigUpdate', payload.status.print_task_config)
+    }
+  },
+
   async onPrinterObjectsSubscribe ({ commit, dispatch }, payload: { status: KlipperPrinterState }) {
     // Initial printer status
     const status = payload.status
@@ -212,6 +219,11 @@ export const actions = {
     // Accept notifications, and commit the first subscribe.
     commit('socket/setAcceptNotifications', true, { root: true })
     await dispatch('onNotifyStatusUpdate', status)
+
+    // Initialize print_task_config if available
+    if (status.print_task_config) {
+      await dispatch('filaments/onPrintTaskConfigUpdate', status.print_task_config)
+    }
 
     SocketActions.serverGcodeStore()
     SocketActions.printerGcodeHelp()
@@ -245,6 +257,11 @@ export const actions = {
       handleSystemStatsChange(payload, rootState, commit)
       handleMcuStatsChange(payload, rootState, commit)
       handleTrinamicDriversChange(payload, rootState, dispatch, getters)
+
+      // Handle print_task_config updates
+      if (payload.print_task_config) {
+        await dispatch('filaments/onPrintTaskConfigUpdate', payload.print_task_config)
+      }
 
       for (const key in payload) {
         const val = payload[key]

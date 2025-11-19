@@ -9,14 +9,18 @@
       <div class="slot-number mb-3">
         <v-avatar
           size="60"
-          :color="filamentSlot.exists ? 'transparent' : 'grey lighten-2'"
-          :style="filamentSlot.exists ? { border: `3px solid #${filamentSlot.colorRgba.slice(0, 6)}` } : {}"
+          color="transparent"
+          :style="filamentSlot.exists ? { border: `3px solid #${filamentSlot.colorRgba.slice(0, 6)}` } : { border: '3px solid #E0E0E0' }"
         >
           <v-avatar
             size="52"
-            :color="filamentSlot.exists ? `#${filamentSlot.colorRgba.slice(0, 6)}` : 'grey lighten-3'"
+            :color="filamentSlot.exists ? `#${filamentSlot.colorRgba.slice(0, 6)}` : 'transparent'"
+            :style="!filamentSlot.exists ? { border: '2px solid #E0E0E0' } : {}"
           >
-            <span class="text-h6 font-weight-bold white--text">
+            <span
+              class="text-h6 font-weight-bold"
+              :class="filamentSlot.exists ? 'white--text' : 'grey--text'"
+            >
               {{ filamentSlot.index + 1 }}
             </span>
           </v-avatar>
@@ -30,20 +34,25 @@
           :color="filamentSlot.exists ? 'grey darken-2' : 'grey lighten-1'"
           :text-color="filamentSlot.exists ? 'white' : 'grey darken-1'"
         >
-          {{ filamentSlot.type || 'N/A' }}
+          {{ filamentSlot.exists ? (filamentSlot.type || 'N/A') : '/' }}
         </v-chip>
       </div>
 
-      <!-- Manufacturer Info -->
-      <div class="manufacturer mb-1">
+      <!-- Manufacturer Info (only when loaded) -->
+      <div
+        v-if="filamentSlot.exists"
+        class="manufacturer mb-1"
+      >
         <div class="text-body-2 font-weight-medium">
-          {{ filamentSlot.vendor || 'Unknown' }}
+          {{ formattedDisplay }}
         </div>
-        <div
-          v-if="filamentSlot.subType"
-          class="text-caption grey--text"
-        >
-          {{ filamentSlot.subType }}
+      </div>
+      <div
+        v-else
+        class="manufacturer mb-1"
+      >
+        <div class="text-body-2 grey--text text--lighten-1">
+          —
         </div>
       </div>
 
@@ -60,13 +69,13 @@
         </span>
       </div>
 
-      <!-- Edit Button (Disabled for now) -->
+      <!-- Edit Button -->
       <v-btn
-        v-if="filamentSlot.exists"
+        v-if="filamentSlot.exists && filamentSlot.editable"
         x-small
         text
-        disabled
         class="mt-2"
+        @click="handleEdit"
       >
         <v-icon
           x-small
@@ -83,11 +92,24 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import type { FilamentSlot as FilamentSlotType } from '@/store/printer/filaments/types'
+import { formatFilamentSlot } from '@/constants/filamentDatabase'
 
 @Component({})
 export default class FilamentSlot extends Vue {
   @Prop({ type: Object, required: true })
   readonly filamentSlot!: FilamentSlotType
+
+  get formattedDisplay (): string {
+    return formatFilamentSlot(
+      this.filamentSlot.vendor,
+      this.filamentSlot.subType,
+      this.filamentSlot.type
+    )
+  }
+
+  handleEdit () {
+    this.$emit('edit', this.filamentSlot)
+  }
 }
 </script>
 

@@ -45,13 +45,14 @@
         fluid
         :class="{
           'fill-height': $route.meta?.fillHeight ?? false,
-          [['single', 'double', 'triple', 'quad'][columnCount - 1]]: true
+          [['single', 'double', 'triple', 'quad'][columnCount - 1]]: true,
         }"
         class="constrained-width pa-2 pa-sm-4"
       >
         <v-row
           v-if="
-            (socketConnected && apiConnected) &&
+            socketConnected &&
+              apiConnected &&
               (!klippyReady || hasWarnings) &&
               !inLayout &&
               $route.name !== 'login'
@@ -62,20 +63,13 @@
           </v-col>
         </v-row>
 
-        <router-view
-          v-if="
-            (socketConnected && apiConnected) ||
-              (!authenticated && apiConnected)
-          "
-        />
+        <router-view v-if="(socketConnected && apiConnected) || (!authenticated && apiConnected)" />
 
         <register-service-worker />
       </v-container>
 
       <socket-disconnected
-        v-if="
-          (!socketConnected && !apiConnected) ||
-            (!socketConnected && authenticated)"
+        v-if="(!socketConnected && !apiConnected) || (!socketConnected && authenticated)"
       />
 
       <template v-if="socketConnected">
@@ -89,6 +83,7 @@
         <bed-screws-adjust-dialog />
         <screws-tilt-adjust-dialog />
         <mmu-edit-ttg-map-dialog />
+        <print-job-config-dialog />
       </template>
     </v-main>
 
@@ -117,15 +112,19 @@ import { getFilesFromDataTransfer, hasFilesInDataTransfer } from '@/util/file-sy
 import type { ThemeConfig } from '@/store/config/types'
 import ActionCommandPromptDialog from '@/components/common/ActionCommandPromptDialog.vue'
 import KeyboardShortcutsDialog from '@/components/common/KeyboardShortcutsDialog.vue'
-import { eventTargetIsContentEditable, keyboardEventToKeyboardShortcut } from '@/util/event-helpers'
+import {
+  eventTargetIsContentEditable,
+  keyboardEventToKeyboardShortcut,
+} from '@/util/event-helpers'
 import MmuEditTtgMapDialog from './components/widgets/mmu/MmuEditTtgMapDialog.vue'
+import PrintJobConfigDialog from '@/components/widgets/printJob/PrintJobConfigDialog.vue'
 
 @Component<App>({
   metaInfo () {
     return {
       title: this.pageTitle,
       link: this.pageIcon,
-      meta: this.pageMeta
+      meta: this.pageMeta,
     }
   },
   components: {
@@ -134,8 +133,9 @@ import MmuEditTtgMapDialog from './components/widgets/mmu/MmuEditTtgMapDialog.vu
     FileSystemUploadDialog,
     ActionCommandPromptDialog,
     KeyboardShortcutsDialog,
-    MmuEditTtgMapDialog
-  }
+    MmuEditTtgMapDialog,
+    PrintJobConfigDialog,
+  },
 })
 export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
   toolsdrawer: boolean | null = null
@@ -146,7 +146,7 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
   flashMessageState: FlashMessage = {
     open: false,
     text: undefined,
-    type: undefined
+    type: undefined,
   }
 
   get theme (): ThemeConfig {
@@ -176,7 +176,7 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
   }
 
   get inLayout (): boolean {
-    return (this.$typedState.config.layoutMode)
+    return this.$typedState.config.layoutMode
   }
 
   get columnCount (): number {
@@ -211,14 +211,14 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
         rel: 'icon',
         type: 'image/svg+xml',
         sizes: '32x32',
-        href: iconDataUrl
+        href: iconDataUrl,
       },
       {
         rel: 'icon',
         type: 'image/svg+xml',
         sizes: '16x16',
-        href: iconDataUrl
-      }
+        href: iconDataUrl,
+      },
     ]
   }
 
@@ -226,8 +226,8 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
     return [
       {
         name: 'theme-color',
-        content: this.primaryColor
-      }
+        content: this.primaryColor,
+      },
     ]
   }
 
@@ -248,7 +248,7 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
         const lineWidth = 10
         const radius = favIconSize / 2 - lineWidth / 2
         const startAngle = 1.5 * Math.PI
-        const endAngle = startAngle + (percent * 2 * Math.PI / 100)
+        const endAngle = startAngle + (percent * 2 * Math.PI) / 100
 
         /* Draw the initial gray circle */
         context.moveTo(centerX, centerY)
@@ -308,7 +308,12 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
   }
 
   get customBackgroundImage (): string | undefined {
-    return this.$typedGetters['config/getCustomThemeFile']('background', ['.png', '.jpg', '.jpeg', '.gif'])
+    return this.$typedGetters['config/getCustomThemeFile']('background', [
+      '.png',
+      '.jpg',
+      '.jpeg',
+      '.gif',
+    ])
   }
 
   @Watch('customBackgroundImage')
@@ -323,7 +328,7 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
       backgroundImage: `url(${url})`,
       backgroundSize: 'cover',
       backgroundAttachment: 'fixed',
-      backgroundRepeat: 'no-repeat'
+      backgroundRepeat: 'no-repeat',
     }
   }
 
@@ -342,19 +347,20 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
     EventBus.bus.$on('flashMessage', (payload: FlashMessage) => {
       this.flashMessageState.text = (payload && payload.text) || undefined
       this.flashMessageState.type = (payload && payload.type) || undefined
-      this.flashMessageState.timeout = (payload && payload.timeout !== undefined) ? payload.timeout : undefined
+      this.flashMessageState.timeout =
+        payload && payload.timeout !== undefined ? payload.timeout : undefined
       this.flashMessageState.open = true
     })
 
     const legacyElementsSelectors = [
       "link[rel*='icon'][type='image/png']",
-      "meta[name='theme-color']"
+      "meta[name='theme-color']",
     ]
 
     for (const legacyElementsSelector of legacyElementsSelectors) {
       const legacyElements = document.querySelectorAll(legacyElementsSelector)
 
-      legacyElements.forEach(item => {
+      legacyElements.forEach((item) => {
         const parentElement = item.parentElement
 
         if (parentElement) {
@@ -400,10 +406,7 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
     if (this.fileDropRoot) {
       event.preventDefault()
 
-      if (
-        event.target instanceof HTMLElement &&
-        event.target.className.includes('fluidd')
-      ) {
+      if (event.target instanceof HTMLElement && event.target.className.includes('fluidd')) {
         this.dragState = false
       }
     }
@@ -422,9 +425,7 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
 
         if (files) {
           const pathWithRoot: string = this.$typedGetters['files/getCurrentPathByRoot'](root)
-          const path = pathWithRoot === root
-            ? ''
-            : pathWithRoot.substring(root.length + 1)
+          const path = pathWithRoot === root ? '' : pathWithRoot.substring(root.length + 1)
 
           const wait = `${this.$waits.onFileSystem}/${pathWithRoot}/`
 
@@ -453,19 +454,13 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
       return
     }
 
-    if (
-      !this.klippyReady ||
-      eventTargetIsContentEditable(event)
-    ) {
+    if (!this.klippyReady || eventTargetIsContentEditable(event)) {
       return
     }
 
     switch (shortcut) {
       case 'Shift+C':
-        if (
-          this.printerPrinting ||
-          this.printerPaused
-        ) {
+        if (this.printerPrinting || this.printerPaused) {
           event.preventDefault()
 
           this.cancelPrint()
@@ -493,13 +488,13 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
 </script>
 
 <style lang="scss" scoped>
-  .background-logo {
-    pointer-events: none;
-    position: fixed;
-    width: 50%;
-    height: auto;
-    right: -10%;
-    bottom: -20%;
-    opacity: 8%;
-  }
+.background-logo {
+  pointer-events: none;
+  position: fixed;
+  width: 50%;
+  height: auto;
+  right: -10%;
+  bottom: -20%;
+  opacity: 8%;
+}
 </style>

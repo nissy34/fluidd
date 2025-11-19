@@ -147,6 +147,8 @@ app:
       confirm: >-
         The file "%{filename}" is %{size}, this might be resource intensive for
         your system. Are you sure?
+      model_info: Model Info
+      filament_usage: Filament Usage
     overlay:
       drag_file_load: <strong>Drag</strong> a gcode file here to load
   general:
@@ -167,6 +169,7 @@ app:
       clear_profile: Clear Profile
       close: Close
       config_reference: Config Reference
+      configure_print: Configure & Print
       copied: Copied
       copy: Copy
       create_zip_archive: Create ZIP Archive
@@ -226,6 +229,7 @@ app:
       socket_reconnect: Re-Connect
       socket_refresh: Force refresh
       perform_time_analysis: Perform Time Analysis
+      start_print: Start Print
       thumbnail_size: Thumbnail size
       upload: Upload
       upload_files: Upload Files
@@ -260,6 +264,7 @@ app:
       api_key: Api Key
       api_url: API URL
       auth_source: Authentication Source
+      auto_bed_leveling: Auto Bed Leveling
       bars: Bars
       category: Category
       change_password: Change password
@@ -282,6 +287,7 @@ app:
       edit_preset: Edit Preset
       edit_user: Edit user
       environment_facing: Environment Facing
+      estimated_time: Estimated Time
       extrude_length: Extrude Length
       extrude_speed: Extrude Speed
       filament: Filament
@@ -289,7 +295,10 @@ app:
       file: File
       finish_time: Finish
       flow: Flow
+      flow_calibrate: Flow Calibrate
       free: free
+      gcode_extruder: G-code Extruder
+      high_confidence: High Confidence
       loaded: Loaded
       empty: Empty
       auto_replenish: Auto Replenish
@@ -306,7 +315,10 @@ app:
       load_filament: Load Filament
       longest_job: Longest job
       low: Low
+      low_confidence: Low Confidence
       manage_accounts: Manage Accounts
+      material_type: Material Type
+      medium_confidence: Medium Confidence
       minimum_cruise_ratio: Minimum Cruise Ratio
       user_managed_source: User managed by %{source} authentication
       m117: M117
@@ -315,6 +327,7 @@ app:
       name: Name
       new_password: New password
       no_notifications: No notifications
+      none: None
       'on': 'On'
       'off': 'Off'
       numeric_prefix_sort: Numeric Prefix sort
@@ -326,6 +339,8 @@ app:
       pause_at_layer_number: Pause at layer number
       power: Power
       pressure_advance: Pressure Advance
+      preview: Preview
+      printer_slot: Printer Slot
       printers: Printers
       progress: Progress
       range: Range
@@ -336,7 +351,9 @@ app:
       screw_index: Screw index
       screw_name: Screw name
       screw_number: Screw %{index}
+      series: Series
       services: Services
+      slot: Slot
       slicer: Slicer
       smooth_time: Smooth Time
       speed: Speed
@@ -345,6 +362,7 @@ app:
       synced_extruder: Synced Extruder
       thumbnail_size: Thumbnail Size
       time_in_days: Time in days
+      time_lapse_camera: Time Lapse Camera
       total: Total
       total_filament: Total filament used
       total_filament_avg: Avg per print
@@ -357,6 +375,7 @@ app:
       turn_device_off: Turn %{device} off
       uncategorized: Uncategorized
       unknown: Unknown
+      unknown_material: Unknown Material
       unload_filament: Unload Filament
       unretract_extra_length: Unretract Extra Length
       unretract_speed: Unretract Speed
@@ -365,6 +384,7 @@ app:
       user_facing: User Facing
       username: Username
       velocity: Velocity
+      vendor: Vendor
       version_sort: Version sort
       visible: Visible
       z_offset: Z Offset
@@ -394,6 +414,8 @@ app:
       fluidd_settings_backup_failed: Failed to backup Fluidd settings!
       fluidd_settings_restore_failed: Failed to restore Fluidd settings!
       gcode_preview_failed: Failed to preview G-code file!
+      no_filament_metadata: >-
+        No filament metadata found in G-code file. Ensure your slicer is configured to include filament information in comments.
     simple_form:
       error:
         arrayofnums: Only numbers
@@ -481,11 +503,14 @@ app:
       camera: Camera | Cameras
       config_files: Configuration Files
       configure: Configuration
+      configure_print_job: Configure Print Job
       console: Console
       diagnostics: Diagnostics
       edit_chart: Edit Chart
+      edit_filament: Edit Filament
       endstops: Endstops
       fans_outputs: Fans & Outputs
+      filament_mapping: Filament Mapping
       gcode_preview: Gcode Preview
       history: History
       home: Home
@@ -498,6 +523,7 @@ app:
       not_found: 404 Not Found
       other_files: Other Files
       pending_configuration_changes: Pending Configuration Changes
+      print_settings: Print Settings
       retract: Firmware Retraction
       rollover_logs: Rollover logs
       runout_sensors: Runout Sensors

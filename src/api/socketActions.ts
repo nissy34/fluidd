@@ -376,6 +376,18 @@ export const SocketActions = {
     )
   },
 
+  async printerObjectsQuery (objects: Record<string, null>, options?: NotifyOptions) {
+    baseEmit(
+      'printer.objects.query', {
+        dispatch: 'printer/onPrinterObjectsQuery',
+        ...options,
+        params: {
+          objects
+        }
+      }
+    )
+  },
+
   async printerObjectsSubscribe (objects: Record<string, null>, options?: NotifyOptions) {
     baseEmit(
       'printer.objects.subscribe', {
