@@ -1,7 +1,11 @@
 <template>
   <v-card
     class="filament-slot"
-    :class="{ 'filament-slot--empty': !filamentSlot.exists }"
+    :class="{
+      'filament-slot--empty': filamentState === 'empty',
+      'filament-slot--not-loaded': filamentState === 'not-loaded',
+      'filament-slot--loaded': filamentState === 'loaded'
+    }"
     elevation="2"
   >
     <v-card-text class="pa-4 text-center">
@@ -60,12 +64,15 @@
       <div class="status-indicator mt-2">
         <v-icon
           small
-          :color="filamentSlot.exists ? 'success' : 'grey'"
+          :color="statusColor"
         >
-          {{ filamentSlot.exists ? 'mdi-check-circle' : 'mdi-circle-outline' }}
+          {{ statusIcon }}
         </v-icon>
-        <span class="text-caption ml-1">
-          {{ filamentSlot.exists ? $t('app.general.label.loaded') : $t('app.general.label.empty') }}
+        <span
+          class="text-caption ml-1 status-badge"
+          :class="`status-badge--${filamentState}`"
+        >
+          {{ statusLabel }}
         </span>
       </div>
 
@@ -92,7 +99,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import type { FilamentSlot as FilamentSlotType } from '@/store/printer/filaments/types'
+import type { RunoutSensor } from '@/store/printer/types'
 import { formatFilamentSlot } from '@/constants/filamentDatabase'
+
+type FilamentState = 'empty' | 'not-loaded' | 'loaded'
 
 @Component({})
 export default class FilamentSlot extends Vue {
@@ -105,6 +115,79 @@ export default class FilamentSlot extends Vue {
       this.filamentSlot.subType,
       this.filamentSlot.type
     )
+  }
+
+  get runoutSensor (): RunoutSensor | undefined {
+    const sensors = this.$typedGetters['printer/getRunoutSensors'] as RunoutSensor[]
+    const sensorName = `e${this.filamentSlot.index}_filament`
+    const found = sensors.find(sensor => sensor.name === sensorName)
+
+    // Debug: log if sensor not found
+    if (!found && this.filamentSlot.exists) {
+      console.debug(`FilamentSlot ${this.filamentSlot.index}: Sensor '${sensorName}' not found. Available sensors:`, sensors.map(s => s.name))
+    }
+
+    return found
+  }
+
+  get filamentState (): FilamentState {
+    if (!this.filamentSlot.exists) {
+      return 'empty'
+    }
+
+    const sensor = this.runoutSensor
+    // Check if sensor exists and filament is detected
+    if (sensor) {
+      // Explicitly check for true - undefined/null/false all mean not loaded
+      if (sensor.filament_detected === true) {
+        return 'loaded'
+      }
+      // Sensor exists but doesn't detect filament (false, null, or undefined)
+      return 'not-loaded'
+    }
+
+    // If sensor not found but filament exists, assume not loaded
+    // (filament is in feeder but not detected by sensor)
+    return 'not-loaded'
+  }
+
+  get statusLabel (): string {
+    switch (this.filamentState) {
+      case 'empty':
+        return this.$t('app.general.label.empty') as string
+      case 'not-loaded':
+        return this.$t('app.general.label.not_loaded') as string
+      case 'loaded':
+        return this.$t('app.general.label.loaded') as string
+      default:
+        return this.$t('app.general.label.empty') as string
+    }
+  }
+
+  get statusIcon (): string {
+    switch (this.filamentState) {
+      case 'empty':
+        return 'mdi-circle-outline'
+      case 'not-loaded':
+        return 'mdi-alert-circle'
+      case 'loaded':
+        return 'mdi-check-circle'
+      default:
+        return 'mdi-circle-outline'
+    }
+  }
+
+  get statusColor (): string {
+    switch (this.filamentState) {
+      case 'empty':
+        return 'grey'
+      case 'not-loaded':
+        return 'info'
+      case 'loaded':
+        return 'success'
+      default:
+        return 'grey'
+    }
   }
 
   handleEdit () {
@@ -129,6 +212,7 @@ export default class FilamentSlot extends Vue {
     opacity: 0.6;
     border: 2px dashed rgba(0, 0, 0, 0.12);
   }
+
 }
 
 .slot-number {
@@ -151,5 +235,26 @@ export default class FilamentSlot extends Vue {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+
+  &--empty {
+    background-color: rgba(158, 158, 158, 0.2);
+    color: rgba(158, 158, 158, 0.9);
+  }
+
+  &--not-loaded {
+    background-color: rgba(33, 150, 243, 0.2);
+    color: rgba(33, 150, 243, 0.9);
+  }
+
+  &--loaded {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: rgba(76, 175, 80, 0.9);
+  }
 }
 </style>
