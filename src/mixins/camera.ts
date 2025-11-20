@@ -23,6 +23,7 @@ export default class CameraMixin extends Vue {
   cameraNameMenuItems: CameraNameMenuItem[] = []
   framesPerSecond = -1
   rawCameraUrl = ''
+  retryTimeoutId: number | null = null
 
   @Watch('camera')
   onCamera () {
@@ -130,7 +131,21 @@ export default class CameraMixin extends Vue {
 
   @Emit('update:status')
   updateStatus (status: CameraConnectionStatus) {
+    const previousStatus = this.status
     this.status = status
+
+    if (status === 'error' && (previousStatus === 'connecting' || previousStatus === 'connected')) {
+      if (this.retryTimeoutId !== null) {
+        clearTimeout(this.retryTimeoutId)
+      }
+
+      this.retryTimeoutId = window.setTimeout(() => {
+        this.retryTimeoutId = null
+        if (!document.hidden) {
+          this.startPlayback()
+        }
+      }, 2000)
+    }
   }
 
   @Emit('update:camera-name')
@@ -158,7 +173,10 @@ export default class CameraMixin extends Vue {
   }
 
   stopPlayback () {
-    // noop
+    if (this.retryTimeoutId !== null) {
+      clearTimeout(this.retryTimeoutId)
+      this.retryTimeoutId = null
+    }
   }
 
   menuItemClick (item: CameraNameMenuItem) {
