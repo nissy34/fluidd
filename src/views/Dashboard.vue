@@ -154,9 +154,7 @@ export default class Dashboard extends Mixins(StateMixin) {
   }
 
   get supportsFilaments (): boolean {
-    // For now, always show filaments widget
-    // Later, can add check for printer capability
-    return true
+    return this.$typedGetters['server/isSnapmakerU1']
   }
 
   get hasMacros (): boolean {
