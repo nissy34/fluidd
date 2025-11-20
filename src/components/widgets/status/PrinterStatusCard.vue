@@ -158,6 +158,17 @@ export default class PrinterStatusCard extends Mixins(StateMixin) {
       return
     }
 
+    const useSnapmakerU1Printdialog: boolean = this.$typedGetters['server/isSnapmakerU1']
+    if (useSnapmakerU1Printdialog) {
+      const { rootPath, filename: filenameOnly } = getFilePaths(filename, 'gcodes')
+      const fileWithMeta = this.$typedGetters['files/getFile'](rootPath, filenameOnly)
+
+      if (fileWithMeta != null) {
+        this.$store.dispatch('printJob/openDialog', fileWithMeta)
+        return
+      }
+    }
+
     SocketActions.printerPrintStart(filename)
   }
 }

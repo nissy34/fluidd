@@ -79,5 +79,13 @@ export const getters = {
         ...item
       }
     }
+  },
+
+  /**
+   * Check if the printer is a Snapmaker U1
+   */
+  isSnapmakerU1: (state, getters, rootState): boolean => {
+    const machineType: string | undefined = rootState.server.system_info?.product_info?.machine_type
+    return machineType?.toLowerCase() === 'snapmaker u1'
   }
 } satisfies GetterTree<ServerState, RootState>

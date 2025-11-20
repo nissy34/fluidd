@@ -60,6 +60,7 @@ export interface SystemInfo {
   network?: NetworkState;
   canbus?: CanBusState;
   instance_ids: InstanceIds;
+  product_info?: ProductInfo;
 }
 
 export interface ServiceState {
@@ -250,4 +251,13 @@ export interface DataStoreConfiguration {
 
 export interface SpoolmanConfiguration {
   server?: string;
+}
+
+export interface ProductInfo {
+  machine_type?: string;
+  nozzle_diameter?: number[];
+  serial_number?: string;
+  device_name?: string;
+  firmware_version?: string;
+  software_version?: string;
 }

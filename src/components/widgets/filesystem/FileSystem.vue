@@ -63,7 +63,6 @@
       :file="contextMenuState.file"
       :position-x="contextMenuState.x"
       :position-y="contextMenuState.y"
-      @configure-print="handleConfigurePrint"
       @print="handlePrint"
       @view="handleFileOpenDialog($event, 'view')"
       @edit="handleFileOpenDialog($event, 'edit')"
@@ -900,13 +899,6 @@ export default class FileSystem extends Mixins(StateMixin, FilesMixin, ServicesM
    * Core file handling.
    * ===========================================================================
    */
-  handleConfigurePrint (file: AppFile | AppFileWithMeta) {
-    if (this.disabled) return
-
-    // Pass the full file object with metadata
-    this.$store.dispatch('printJob/openDialog', file)
-  }
-
   handlePrint (file: AppFile | AppFileWithMeta) {
     if (this.disabled) return
 
@@ -937,6 +929,12 @@ export default class FileSystem extends Mixins(StateMixin, FilesMixin, ServicesM
         filename,
       })
 
+      return
+    }
+
+    const useSnapmakerU1Printdialog: boolean = this.$typedGetters['server/isSnapmakerU1']
+    if (useSnapmakerU1Printdialog) {
+      this.$store.dispatch('printJob/openDialog', file)
       return
     }
 
