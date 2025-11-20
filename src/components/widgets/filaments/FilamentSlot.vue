@@ -67,21 +67,17 @@
         </div>
       </div>
 
-      <!-- Edit Icon Section -->
-      <div class="status-section">
-        <!-- Edit Icon -->
-        <div
-          v-if="filamentSlot.exists && filamentSlot.editable"
-          class="edit-icon-container"
+      <!-- Edit Icon -->
+      <div
+        v-if="filamentSlot.exists && filamentSlot.editable"
+        class="edit-icon-container"
+      >
+        <v-icon
+          color="grey darken-1"
+          @click="handleEdit"
         >
-          <v-icon
-            small
-            color="grey darken-1"
-            @click="handleEdit"
-          >
-            $edit
-          </v-icon>
-        </div>
+          $edit
+        </v-icon>
       </div>
     </v-card-text>
   </v-card>
@@ -295,18 +291,6 @@ export default class FilamentSlot extends Vue {
   }
 }
 
-// Status Section - always at bottom
-.status-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: auto;
-  flex-shrink: 0;
-  width: 100%;
-  max-width: 100%;
-}
-
 // Tube Fill - positioned at top of SVG to show filament inside tube, extending below extruder
 .tube-fill {
   position: absolute;
@@ -374,26 +358,25 @@ export default class FilamentSlot extends Vue {
   }
 }
 
-// Edit Icon - above status badge
+// Edit Icon - positioned between material badge and manufacturer info
 .edit-icon-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  margin-top: 2px;
   cursor: pointer;
-
+  width: 100%;
   opacity: 0.7;
   transition: opacity 0.2s ease;
   flex-shrink: 0;
-  width: 100%;
-  max-width: 100%;
 
   &:hover {
     opacity: 1;
   }
 
   ::v-deep .v-icon {
-    font-size: 16px;
+    font-size: 22px;
   }
 }
 
@@ -487,10 +470,11 @@ export default class FilamentSlot extends Vue {
   }
 
   .edit-icon-container {
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    margin-top: 2px;
 
     ::v-deep .v-icon {
-      font-size: 16px;
+      font-size: 20px;
     }
   }
 }
