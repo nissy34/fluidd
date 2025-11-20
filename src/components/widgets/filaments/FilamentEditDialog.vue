@@ -225,7 +225,7 @@ export default class FilamentEditDialog extends Vue {
 
   get displayName (): string {
     if (!this.selectedVendor || !this.selectedMaterial) return ''
-    return getFilamentDisplayName(this.selectedVendor, this.selectedSubType, this.selectedMaterial)
+    return getFilamentDisplayName(this.selectedVendor, this.selectedSubType)
   }
 
   get isValid (): boolean {

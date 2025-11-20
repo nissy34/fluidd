@@ -15,6 +15,15 @@
         alt="Extruder"
         class="extruder-svg"
       >
+      <!-- Tube Fill - shows filament when loaded -->
+      <div
+        v-if="filamentState === 'loaded' && filamentSlot.exists"
+        class="tube-fill"
+        :style="getTubeFillStyle()"
+      >
+        <div class="tube-fill__filament" />
+        <div class="tube-fill__highlight" />
+      </div>
     </div>
 
     <!-- Content Overlay -->
@@ -58,9 +67,9 @@
         </div>
       </div>
 
-      <!-- Status Section (Edit Icon + Status Badge) -->
+      <!-- Edit Icon Section -->
       <div class="status-section">
-        <!-- Edit Icon (above status) -->
+        <!-- Edit Icon -->
         <div
           v-if="filamentSlot.exists && filamentSlot.editable"
           class="edit-icon-container"
@@ -72,16 +81,6 @@
           >
             $edit
           </v-icon>
-        </div>
-
-        <!-- Status Indicator -->
-        <div class="status-indicator">
-          <span
-            class="status-badge"
-            :class="`status-badge--${filamentState}`"
-          >
-            {{ statusLabel }}
-          </span>
         </div>
       </div>
     </v-card-text>
@@ -143,42 +142,23 @@ export default class FilamentSlot extends Vue {
     return 'not-loaded'
   }
 
-  get statusLabel (): string {
-    switch (this.filamentState) {
-      case 'empty':
-        return this.$t('app.general.label.empty') as string
-      case 'not-loaded':
-        return this.$t('app.general.label.not_loaded') as string
-      case 'loaded':
-        return this.$t('app.general.label.loaded') as string
-      default:
-        return this.$t('app.general.label.empty') as string
+  getTubeFillStyle () {
+    if (!this.filamentSlot.exists || !this.filamentSlot.colorRgba) {
+      return {}
     }
-  }
+    const color = `#${this.filamentSlot.colorRgba.slice(0, 6)}`
+    // Create a darker shade for the gradient base
+    const r = parseInt(color.slice(1, 3), 16)
+    const g = parseInt(color.slice(3, 5), 16)
+    const b = parseInt(color.slice(5, 7), 16)
+    const darkerR = Math.max(0, r - 30)
+    const darkerG = Math.max(0, g - 30)
+    const darkerB = Math.max(0, b - 30)
+    const darkerColor = `rgb(${darkerR}, ${darkerG}, ${darkerB})`
 
-  get statusIcon (): string {
-    switch (this.filamentState) {
-      case 'empty':
-        return 'mdi-circle-outline'
-      case 'not-loaded':
-        return 'mdi-alert-circle'
-      case 'loaded':
-        return 'mdi-check-circle'
-      default:
-        return 'mdi-circle-outline'
-    }
-  }
-
-  get statusColor (): string {
-    switch (this.filamentState) {
-      case 'empty':
-        return 'grey'
-      case 'not-loaded':
-        return 'info'
-      case 'loaded':
-        return 'success'
-      default:
-        return 'grey'
+    return {
+      '--filament-color': color,
+      '--filament-color-dark': darkerColor
     }
   }
 
@@ -226,7 +206,6 @@ export default class FilamentSlot extends Vue {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 0;
 }
 
 .extruder-svg {
@@ -242,7 +221,6 @@ export default class FilamentSlot extends Vue {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
   width: 100px;
   height: 220px;
   padding: 32px 10px 24px 10px !important;
@@ -329,6 +307,73 @@ export default class FilamentSlot extends Vue {
   max-width: 100%;
 }
 
+// Tube Fill - positioned at top of SVG to show filament inside tube, extending below extruder
+.tube-fill {
+  position: absolute;
+  top: 0; // Start at top of container (tube location)
+  left: 50%; // Center horizontally (tube is at x=32 in 64-unit viewBox = 50%)
+  transform: translateX(-50%); // Center the element itself
+  width: 18px; // Filament width (closer to tube width of 18.75px)
+  height: 180px; // Long filament extending well below extruder
+  border: 0.5px solid rgba(129, 129, 129, 0.6); // Tube border (only visible at top)
+  // border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05); // Slight glass-like background
+  box-shadow:
+    inset 0 0 2px rgba(0, 0, 0, 0.2),
+    0 0 1px rgba(129, 129, 129, 0.3);
+  overflow: visible; // Allow filament to extend beyond container
+  box-sizing: border-box;
+  z-index: -1; // Behind the extruder (extruder is z-index: 2)
+
+  // Filament strand - starts at tube top, extends down below extruder
+  &__filament {
+    position: absolute;
+    top: 0.5px;
+    left: 4px; // Narrower: inset from sides
+    right: 4px; // Narrower: inset from sides
+    bottom: 0; // Extends to bottom of container
+    border-radius: 1.5px;
+    // Base filament color with gradient for cylindrical effect and vertical fade
+    background: linear-gradient(
+        to right,
+        var(--filament-color-dark) 0%,
+        var(--filament-color) 30%,
+        var(--filament-color) 70%,
+        var(--filament-color-dark) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        var(--filament-color) 0%,
+        var(--filament-color) 50%,
+        var(--filament-color) 70%,
+        transparent 100%
+      );
+    // Add depth with shadows for cylindrical look
+    box-shadow:
+      inset -0.5px 0 1px rgba(0, 0, 0, 0.4),
+      inset 0.5px 0 1px rgba(255, 255, 255, 0.25),
+      inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    z-index: -2;
+  }
+
+  // Highlight on top for 3D effect (only in tube area)
+  &__highlight {
+    position: absolute;
+    top: 0.5px;
+    left: 0.5px;
+    right: 0.5px;
+    height: 15px; // Only highlight the tube area at the top
+    border-radius: 1.5px 1.5px 0 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
 // Edit Icon - above status badge
 .edit-icon-container {
   display: flex;
@@ -336,7 +381,7 @@ export default class FilamentSlot extends Vue {
   justify-content: center;
   margin-bottom: 4px;
   cursor: pointer;
-  z-index: 2;
+
   opacity: 0.7;
   transition: opacity 0.2s ease;
   flex-shrink: 0;
@@ -439,11 +484,6 @@ export default class FilamentSlot extends Vue {
 
   .manufacturer-text {
     font-size: 0.75rem;
-  }
-
-  .status-badge {
-    font-size: 0.7rem;
-    padding: 4px 8px;
   }
 
   .edit-icon-container {
