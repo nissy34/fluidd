@@ -10,6 +10,65 @@ import { consola } from 'consola'
 
 let saveDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
+/**
+ * Fetches a file using byte range requests to handle large files and chunked encoding.
+ * @param filepath The file path (e.g., 'gcodes/folder/file.gcode')
+ * @param fileSize The size of the file in bytes
+ * @param chunkSize The size of each chunk in bytes (default: 5MB)
+ * @returns The file content as a string
+ */
+async function fetchFileWithByteRanges (
+  filepath: string,
+  fileSize: number,
+  chunkSize: number = 5 * 1024 * 1024
+): Promise<string> {
+  if (!fileSize || fileSize <= 0) {
+    throw new Error('File size must be greater than 0 for byte range requests')
+  }
+
+  const byteChunks: Uint8Array[] = []
+
+  // Fetch file in chunks using byte range requests
+  for (let start = 0; start < fileSize; start += chunkSize) {
+    const end = Math.min(start + chunkSize - 1, fileSize - 1)
+    const rangeHeader = `bytes=${start}-${end}`
+
+    try {
+      const chunkResponse = await httpClientActions.serverFilesGet<ArrayBuffer>(
+        filepath,
+        {
+          responseType: 'arraybuffer',
+          headers: {
+            Range: rangeHeader
+          }
+        }
+      )
+
+      // Check if we got a partial content response (206) or full content (200)
+      if (chunkResponse.status !== 200 && chunkResponse.status !== 206) {
+        throw new Error(`Failed to fetch chunk ${start}-${end}: ${chunkResponse.status}`)
+      }
+
+      byteChunks.push(new Uint8Array(chunkResponse.data))
+    } catch (error) {
+      consola.error(`Error fetching chunk ${start}-${end}:`, error)
+      throw new Error(`Failed to fetch chunk ${start}-${end}: ${error instanceof Error ? error.message : String(error)}`)
+    }
+  }
+
+  // Combine all byte chunks into a single Uint8Array
+  const combined = new Uint8Array(fileSize)
+  let offset = 0
+  for (const chunk of byteChunks) {
+    combined.set(chunk, offset)
+    offset += chunk.length
+  }
+
+  // Decode the complete byte array to text
+  const decoder = new TextDecoder('utf-8', { fatal: false })
+  return decoder.decode(combined)
+}
+
 export const actions: ActionTree<PrintJobState, RootState> = {
   /**
    * Open dialog and load G-code file for configuration
@@ -46,13 +105,13 @@ export const actions: ActionTree<PrintJobState, RootState> = {
         ? fullPath
         : `gcodes/${fullPath}`
 
-      // Fetch G-code file content
-      const response = await httpClientActions.serverFilesGet<string>(
-        filepath,
-        { responseType: 'text' }
-      )
+      // Use byte range requests to fetch file in chunks - more reliable for large files
+      const fileSize = file.size || 0
+      if (!fileSize) {
+        throw new Error('Cannot determine file size for range requests - file size is required')
+      }
 
-      const gcodeContent = response.data
+      const gcodeContent = await fetchFileWithByteRanges(filepath, fileSize)
 
       // Step 1: Get configured filaments from Moonraker metadata (colors, types, vendor)
       // This is already in file.filament_colors, file.filament_type, etc.
