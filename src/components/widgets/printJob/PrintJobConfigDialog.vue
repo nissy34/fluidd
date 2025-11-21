@@ -113,14 +113,16 @@
               {{ $t('app.general.title.filament_mapping') }}
             </h3>
 
-            <filament-mapping-row
-              v-for="mapping in mappings"
-              :key="mapping.gcodeExtruderIndex"
-              :mapping="mapping"
-              :gcode-extruder="getGcodeExtruder(mapping.gcodeExtruderIndex)"
-              :printer-slots="printerSlots"
-              @update="handleMappingUpdate"
-            />
+            <div class="filament-mapping-container">
+              <filament-mapping-row
+                v-for="mapping in mappings"
+                :key="`${mapping.gcodeExtruderIndex}-${mapping.printerSlotIndex}`"
+                :mapping="mapping"
+                :gcode-extruder="getGcodeExtruder(mapping.gcodeExtruderIndex)"
+                :printer-slots="printerSlots"
+                @update="handleMappingUpdate"
+              />
+            </div>
           </div>
 
           <!-- Print Settings Section -->
@@ -276,3 +278,12 @@ export default class PrintJobConfigDialog extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.filament-mapping-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+</style>
