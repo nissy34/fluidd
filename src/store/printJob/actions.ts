@@ -10,79 +10,57 @@ import { autoMapFilaments } from '@/util/filamentMapper'
 import { consola } from 'consola'
 
 /**
- * Fetches a file using byte range requests to handle large files and chunked encoding.
+ * Fetches a file using a single HTTP request with gzip disabled.
  * @param filepath The file path (e.g., 'gcodes/folder/file.gcode')
- * @param fileSize The size of the file in bytes
- * @param chunkSize The size of each chunk in bytes (default: 5MB)
- * @param onProgress Optional callback function called after each chunk is downloaded with the current progress in bytes
+ * @param fileSize The size of the file in bytes (used for progress calculation)
+ * @param onProgress Optional callback function called during download with the current progress in bytes
  * @returns The file content as a string
  */
 async function fetchFileWithByteRanges (
   filepath: string,
   fileSize: number,
-  chunkSize: number = 100 * 1024 * 1024,
   onProgress?: (progress: number) => void
 ): Promise<string> {
-  if (!fileSize || fileSize <= 0) {
-    throw new Error('File size must be greater than 0 for byte range requests')
-  }
+  try {
+    // Use byte range request with large range (1GB) to disable gzip compression
+    // Many servers disable compression for range requests
+    const rangeEnd = Math.min(fileSize - 1, 1024 * 1024 * 1024 - 1) // 1GB max
+    const rangeHeader = `bytes=0-${rangeEnd}`
 
-  const byteChunks: Uint8Array[] = []
-
-  // Fetch file in chunks using byte range requests
-  for (let start = 0; start < fileSize; start += chunkSize) {
-    const end = Math.min(start + chunkSize - 1, fileSize - 1)
-    const rangeHeader = `bytes=${start}-${end}`
-
-    try {
-      const chunkResponse = await httpClientActions.serverFilesGet<ArrayBuffer>(
-        filepath,
-        {
-          responseType: 'arraybuffer',
-          headers: {
-            Range: rangeHeader
-          },
-          onDownloadProgress: (event: AxiosProgressEvent) => {
-            if (onProgress) {
-              // Calculate cumulative progress: bytes from previous chunks + bytes from current chunk
-              const currentChunkProgress = event.loaded || 0
-              const totalProgress = Math.min(start + currentChunkProgress, fileSize)
-              onProgress(totalProgress)
-            }
+    const response = await httpClientActions.serverFilesGet<ArrayBuffer>(
+      filepath,
+      {
+        responseType: 'arraybuffer',
+        headers: {
+          Range: rangeHeader
+        },
+        onDownloadProgress: (event: AxiosProgressEvent) => {
+          if (onProgress) {
+            // Use event.loaded for progress
+            const progress = event.loaded || 0
+            const total = event.total || fileSize
+            const currentProgress = Math.min(progress, total)
+            onProgress(currentProgress)
           }
         }
-      )
-
-      // Check if we got a partial content response (206) or full content (200)
-      if (chunkResponse.status !== 200 && chunkResponse.status !== 206) {
-        throw new Error(`Failed to fetch chunk ${start}-${end}: ${chunkResponse.status}`)
       }
+    )
 
-      const chunk = new Uint8Array(chunkResponse.data)
-      byteChunks.push(chunk)
-
-      // Ensure progress is set to the end of this chunk
-      if (onProgress) {
-        const currentProgress = Math.min(start + chunk.length, fileSize)
-        onProgress(currentProgress)
-      }
-    } catch (error) {
-      consola.error(`Error fetching chunk ${start}-${end}:`, error)
-      throw new Error(`Failed to fetch chunk ${start}-${end}: ${error instanceof Error ? error.message : String(error)}`)
+    // Check if we got a full content response (200)
+    if (response.status !== 200) {
+      throw new Error(`Failed to fetch file: ${response.status}`)
     }
-  }
 
-  // Combine all byte chunks into a single Uint8Array
-  const combined = new Uint8Array(fileSize)
-  let offset = 0
-  for (const chunk of byteChunks) {
-    combined.set(chunk, offset)
-    offset += chunk.length
-  }
+    // Decode the response data to text
+    const data = new Uint8Array(response.data)
 
-  // Decode the complete byte array to text
-  const decoder = new TextDecoder('utf-8', { fatal: false })
-  return decoder.decode(combined)
+    // Decode to text
+    const decoder = new TextDecoder('utf-8', { fatal: false })
+    return decoder.decode(data)
+  } catch (error) {
+    consola.error('Error fetching file:', error)
+    throw new Error(`Failed to fetch file: ${error instanceof Error ? error.message : String(error)}`)
+  }
 }
 
 export const actions: ActionTree<PrintJobState, RootState> = {
@@ -122,16 +100,12 @@ export const actions: ActionTree<PrintJobState, RootState> = {
         ? fullPath
         : `gcodes/${fullPath}`
 
-      // Use byte range requests to fetch file in chunks - more reliable for large files
+      // Fetch file with gzip disabled and progress tracking
       const fileSize = file.size || 0
-      if (!fileSize) {
-        throw new Error('Cannot determine file size for range requests - file size is required')
-      }
 
       const gcodeContent = await fetchFileWithByteRanges(
         filepath,
         fileSize,
-        100 * 1024 * 1024,
         (progress) => {
           commit('setDownloadProgress', progress)
         }
