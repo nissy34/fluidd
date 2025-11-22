@@ -33,9 +33,20 @@
         <div class="filament-content">
           <div
             class="slot-circle"
-            :style="{ backgroundColor: circleColor }"
+            :class="{ 'slot-circle-error': hasNoCompatibleFilament }"
+            :style="{ backgroundColor: hasNoCompatibleFilament ? '#f44336' : circleColor }"
           >
-            <span class="slot-number">
+            <v-icon
+              v-if="hasNoCompatibleFilament"
+              color="white"
+              size="32"
+            >
+              $warning
+            </v-icon>
+            <span
+              v-else
+              class="slot-number"
+            >
               {{ slotNumber }}
             </span>
           </div>
@@ -57,7 +68,9 @@
       <v-list-item
         v-for="item in slotItems"
         :key="item.value"
-        @click="handleChange(item.value)"
+        :disabled="!item.isCompatible"
+        :class="{ 'incompatible-item': !item.isCompatible }"
+        @click="handleChange(item.value, item.isCompatible)"
       >
         <v-list-item-icon>
           <div
@@ -78,11 +91,19 @@
             {{ item.details }}
           </v-list-item-subtitle>
         </v-list-item-content>
-        <v-list-item-action
-          v-if="mapping.printerSlotIndex === item.value"
-        >
-          <v-icon color="primary">
+        <v-list-item-action>
+          <v-icon
+            v-if="mapping.printerSlotIndex === item.value"
+            color="primary"
+          >
             $check
+          </v-icon>
+          <v-icon
+            v-else-if="!item.isCompatible"
+            color="warning"
+            small
+          >
+            $warning
           </v-icon>
         </v-list-item-action>
       </v-list-item>
@@ -96,12 +117,14 @@ import type { ExtruderMetadata } from '@/util/parseFilamentMetadata'
 import type { FilamentMapping } from '@/util/filamentMapper'
 import type { FilamentSlot } from '@/store/printer/filaments/types'
 import { rgbaToHex } from '@/util/parseFilamentMetadata'
+import { materialsMatch } from '@/util/filamentMapper'
 
 interface SlotItem {
   value: number | null
   text: string
   color: string | null
   details: string | null
+  isCompatible: boolean
 }
 
 @Component({})
@@ -117,21 +140,32 @@ export default class FilamentMappingRow extends Vue {
 
   get slotItems (): SlotItem[] {
     const items: SlotItem[] = []
+    const gcodeMaterial = this.gcodeExtruder?.type || null
+    const hasGcodeMaterial = !!gcodeMaterial
 
     // Add available printer slots (1-based display)
     for (let i = 0; i < this.printerSlots.length; i++) {
       const slot = this.printerSlots[i]
       if (slot.exists) {
+        // Only check compatibility if G-code material is known
+        // If unknown, allow all slots (treat as compatible)
+        const isCompatible = hasGcodeMaterial ? materialsMatch(slot.type, gcodeMaterial) : true
         items.push({
           value: i,
           text: `${this.$t('app.general.label.slot')} ${i + 1}`,
           color: slot.colorRgba ? rgbaToHex(slot.colorRgba) : null,
-          details: slot.vendor && slot.type ? `${slot.vendor} ${slot.type}` : slot.type
+          details: slot.vendor && slot.type ? `${slot.vendor} ${slot.type}` : slot.type,
+          isCompatible
         })
       }
     }
 
     return items
+  }
+
+  get hasNoCompatibleFilament (): boolean {
+    if (!this.gcodeExtruder?.type) return false
+    return !this.slotItems.some(item => item.isCompatible)
   }
 
   get materialType (): string {
@@ -180,7 +214,11 @@ export default class FilamentMappingRow extends Vue {
     return null
   }
 
-  handleChange (value: number | null) {
+  handleChange (value: number | null, isCompatible: boolean = true) {
+    // Prevent selecting incompatible materials
+    if (!isCompatible) {
+      return
+    }
     this.$emit('update', {
       gcodeExtruderIndex: this.mapping.gcodeExtruderIndex,
       printerSlotIndex: value
@@ -249,6 +287,10 @@ export default class FilamentMappingRow extends Vue {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.slot-circle-error {
+  background-color: #f44336 !important;
+}
+
 .slot-number {
   color: white;
   font-size: 24px;
@@ -279,5 +321,14 @@ export default class FilamentMappingRow extends Vue {
   border: 2px dashed rgba(0, 0, 0, 0.2);
   background: transparent;
   flex-shrink: 0;
+}
+
+.incompatible-item {
+  color: #ff9800 !important;
+}
+
+.incompatible-item .v-list-item__title,
+.incompatible-item .v-list-item__subtitle {
+  color: #ff9800 !important;
 }
 </style>

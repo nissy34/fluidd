@@ -14,6 +14,29 @@ export interface FilamentMapping {
 }
 
 /**
+ * Normalize material type for comparison (case-insensitive, trim whitespace)
+ * @param material - Material type string
+ * @returns Normalized material string or null if empty
+ */
+function normalizeMaterial (material: string | null | undefined): string | null {
+  if (!material) return null
+  return material.trim().toLowerCase() || null
+}
+
+/**
+ * Check if two material types match (case-insensitive comparison)
+ * @param material1 - First material type
+ * @param material2 - Second material type
+ * @returns true if materials match, false otherwise
+ */
+export function materialsMatch (material1: string | null | undefined, material2: string | null | undefined): boolean {
+  const norm1 = normalizeMaterial(material1)
+  const norm2 = normalizeMaterial(material2)
+  if (!norm1 || !norm2) return false
+  return norm1 === norm2
+}
+
+/**
  * Calculate Euclidean distance between two RGB colors
  * @returns Distance value (0 = identical, ~442 = max difference)
  */
@@ -60,34 +83,32 @@ export function autoMapFilaments (
     for (const { slot, index } of availableSlots) {
       if (!slot.colorRgba) continue
 
+      // Only consider slots with matching material type
+      if (!materialsMatch(slot.type, gcode.type)) {
+        continue
+      }
+
       const slotHex = rgbaToHex(slot.colorRgba)
       const slotRgb = hexToRgb(slotHex)
       if (!slotRgb || !gcodeRgb) continue
 
       const distance = calculateColorDistance(gcodeRgb, slotRgb)
-      const hasTypeMatch = !!(
-        slot.type &&
-        gcode.type &&
-        slot.type.toLowerCase() === gcode.type.toLowerCase()
-      )
+      const hasTypeMatch = true // All items in prefs now have matching materials
 
       prefs.push({ slotIndex: index, distance, hasTypeMatch })
     }
 
-    // Sort by: 1) Type match first, 2) Then by distance (closest first)
-    prefs.sort((a, b) => {
-      if (a.hasTypeMatch !== b.hasTypeMatch) {
-        return a.hasTypeMatch ? -1 : 1
-      }
-      return a.distance - b.distance
-    })
+    // Sort by distance (closest first) - all have matching materials
+    prefs.sort((a, b) => a.distance - b.distance)
 
     return { extruderIndex, extruder: gcode, preferences: prefs }
   })
 
   // Assign best match for each extruder (allows multiple G-code extruders to map to same slot)
+  // Only matches slots with same material type - never allows different materials
   const mappings: FilamentMapping[] = preferences.map(({ extruderIndex, preferences: prefs }) => {
-    if (prefs.length === 0 || availableSlots.length === 0) {
+    // If no matching material slots found, return unmapped
+    if (prefs.length === 0) {
       return {
         gcodeExtruderIndex: extruderIndex,
         printerSlotIndex: null,
@@ -96,9 +117,10 @@ export function autoMapFilaments (
     }
 
     const bestMatch = prefs[0]
-    const confidence = bestMatch.hasTypeMatch && bestMatch.distance < 100
+    // All matches have same material, so confidence based on color distance
+    const confidence = bestMatch.distance < 100
       ? 'high'
-      : bestMatch.distance < 100
+      : bestMatch.distance < 200
         ? 'medium'
         : 'low'
 
