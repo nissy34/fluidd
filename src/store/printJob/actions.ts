@@ -8,8 +8,6 @@ import { parseFilamentMetadata, findUsedExtruders } from '@/util/parseFilamentMe
 import { autoMapFilaments } from '@/util/filamentMapper'
 import { consola } from 'consola'
 
-let saveDebounceTimer: ReturnType<typeof setTimeout> | null = null
-
 /**
  * Fetches a file using byte range requests to handle large files and chunked encoding.
  * @param filepath The file path (e.g., 'gcodes/folder/file.gcode')
@@ -183,45 +181,15 @@ export const actions: ActionTree<PrintJobState, RootState> = {
   /**
    * Manually update a mapping (user changed dropdown)
    */
-  updateMapping ({ commit, dispatch }, payload: { gcodeExtruderIndex: number, printerSlotIndex: number | null }) {
+  updateMapping ({ commit }, payload: { gcodeExtruderIndex: number, printerSlotIndex: number | null }) {
     commit('updateMapping', payload)
-    dispatch('debouncedApplySettings')
   },
 
   /**
-   * Update print settings (user toggled checkbox)
+   * Update print settings (user toggled switch)
    */
-  updateSettings ({ commit, dispatch }, settings: Partial<PrintJobState['settings']>) {
+  updateSettings ({ commit }, settings: Partial<PrintJobState['settings']>) {
     commit('setSettings', settings)
-    dispatch('debouncedApplySettings')
-  },
-
-  /**
-   * Debounced application of settings to printer
-   */
-  debouncedApplySettings ({ dispatch }) {
-    if (saveDebounceTimer) {
-      clearTimeout(saveDebounceTimer)
-    }
-
-    saveDebounceTimer = setTimeout(() => {
-      dispatch('applySettingsToPrinter')
-    }, 1000)
-  },
-
-  /**
-   * Apply settings to printer via G-code commands
-   */
-  async applySettingsToPrinter ({ state }) {
-    try {
-      // Send print preferences command
-      const preferences = `SET_PRINT_PREFERENCES BED_LEVEL=${state.settings.autoBedLeveling ? 1 : 0} FLOW_CALIBRATE=${state.settings.flowCalibrate ? 1 : 0} TIME_LAPSE_CAMERA=${state.settings.timeLapseCamera ? 1 : 0}`
-      SocketActions.printerGcodeScript(preferences)
-
-      consola.info('Print preferences applied:', state.settings)
-    } catch (error) {
-      consola.error('Failed to apply print preferences:', error)
-    }
   },
 
   /**

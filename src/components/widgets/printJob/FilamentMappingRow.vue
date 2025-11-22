@@ -191,8 +191,8 @@ export default class FilamentMappingRow extends Vue {
 
 <style scoped>
 .filament-card {
-  width: 140px;
-  min-height: 140px;
+  width: 120px;
+  min-height: 120px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -207,7 +207,7 @@ export default class FilamentMappingRow extends Vue {
 }
 
 .filament-bar {
-  height: 36px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -224,9 +224,9 @@ export default class FilamentMappingRow extends Vue {
 }
 
 .filament-weight {
-  padding: 8px;
+  padding: 6px;
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: white;
 }
@@ -236,12 +236,12 @@ export default class FilamentMappingRow extends Vue {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 8px;
 }
 
 .slot-circle {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -251,7 +251,7 @@ export default class FilamentMappingRow extends Vue {
 
 .slot-number {
   color: white;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.8);
 }
@@ -260,7 +260,7 @@ export default class FilamentMappingRow extends Vue {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 4px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 

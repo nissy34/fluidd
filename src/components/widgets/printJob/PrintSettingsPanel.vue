@@ -6,7 +6,7 @@
 
     <v-card outlined>
       <v-card-text>
-        <v-checkbox
+        <v-switch
           :input-value="settings.autoBedLeveling"
           :label="$t('app.general.label.auto_bed_leveling')"
           hide-details
@@ -14,7 +14,7 @@
           @change="updateSetting('autoBedLeveling', $event)"
         />
 
-        <v-checkbox
+        <v-switch
           :input-value="settings.flowCalibrate"
           :label="$t('app.general.label.flow_calibrate')"
           hide-details
@@ -22,7 +22,7 @@
           @change="updateSetting('flowCalibrate', $event)"
         />
 
-        <v-checkbox
+        <v-switch
           :input-value="settings.timeLapseCamera"
           :label="$t('app.general.label.time_lapse_camera')"
           hide-details
