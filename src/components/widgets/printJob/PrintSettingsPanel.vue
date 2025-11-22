@@ -6,29 +6,43 @@
 
     <v-card outlined>
       <v-card-text>
-        <v-switch
-          :input-value="settings.autoBedLeveling"
-          :label="$t('app.general.label.auto_bed_leveling')"
-          hide-details
-          class="mt-0"
-          @change="updateSetting('autoBedLeveling', $event)"
-        />
+        <v-row>
+          <v-col
+            cols="12"
+            sm="4"
+          >
+            <v-switch
+              :input-value="settings.autoBedLeveling"
+              :label="$t('app.general.label.auto_bed_leveling')"
+              hide-details
+              @change="updateSetting('autoBedLeveling', $event)"
+            />
+          </v-col>
 
-        <v-switch
-          :input-value="settings.flowCalibrate"
-          :label="$t('app.general.label.flow_calibrate')"
-          hide-details
-          class="mt-2"
-          @change="updateSetting('flowCalibrate', $event)"
-        />
+          <v-col
+            cols="12"
+            sm="4"
+          >
+            <v-switch
+              :input-value="settings.flowCalibrate"
+              :label="$t('app.general.label.flow_calibrate')"
+              hide-details
+              @change="updateSetting('flowCalibrate', $event)"
+            />
+          </v-col>
 
-        <v-switch
-          :input-value="settings.timeLapseCamera"
-          :label="$t('app.general.label.time_lapse_camera')"
-          hide-details
-          class="mt-2"
-          @change="updateSetting('timeLapseCamera', $event)"
-        />
+          <v-col
+            cols="12"
+            sm="4"
+          >
+            <v-switch
+              :input-value="settings.timeLapseCamera"
+              :label="$t('app.general.label.time_lapse_camera')"
+              hide-details
+              @change="updateSetting('timeLapseCamera', $event)"
+            />
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
   </div>

@@ -11,6 +11,7 @@ export const defaultState = (): PrintJobState => {
       flowCalibrate: false,
       timeLapseCamera: false
     },
-    isLoading: false
+    isLoading: false,
+    downloadProgress: 0
   }
 }

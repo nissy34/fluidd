@@ -17,7 +17,7 @@
 
       <v-card-text style="max-height: 600px;">
         <v-alert
-          v-if="!hasMetadata"
+          v-if="!isLoading && !hasMetadata"
           type="warning"
           text
           dense
@@ -26,12 +26,25 @@
           {{ $t('app.general.msg.no_filament_metadata') }}
         </v-alert>
 
-        <v-progress-linear
-          v-if="isLoading"
-          indeterminate
-          color="primary"
-          class="mb-4"
-        />
+        <div v-if="isLoading">
+          <v-progress-linear
+            :value="downloadPercent"
+            color="primary"
+            class="mb-2"
+          />
+          <table v-if="currentFile">
+            <tr>
+              <td class="pr-2">
+                {{ $t('app.gcode.label.parsed') }}:
+              </td>
+              <td>
+                {{ downloadPercent }}%
+                ({{ $filters.getReadableFileSizeString(downloadProgress) }} /
+                {{ $filters.getReadableFileSizeString(currentFile.size) }})
+              </td>
+            </tr>
+          </table>
+        </div>
 
         <div v-if="!isLoading && currentFile">
           <!-- Model Info Section -->
@@ -199,6 +212,15 @@ export default class PrintJobConfigDialog extends Vue {
 
   get isLoading (): boolean {
     return this.$store.state.printJob?.isLoading ?? false
+  }
+
+  get downloadProgress (): number {
+    return this.$store.state.printJob?.downloadProgress ?? 0
+  }
+
+  get downloadPercent (): number {
+    if (!this.currentFile?.size) return 0
+    return Math.floor((this.downloadProgress / this.currentFile.size) * 100)
   }
 
   get hasMetadata (): boolean {

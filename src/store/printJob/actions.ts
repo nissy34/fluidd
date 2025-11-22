@@ -2,6 +2,7 @@ import type { ActionTree } from 'vuex'
 import type { PrintJobState } from './types'
 import type { AppFile, AppFileWithMeta } from '@/store/files/types'
 import type { RootState } from '@/store/types'
+import type { AxiosProgressEvent } from 'axios'
 import { httpClientActions } from '@/api/httpClientActions'
 import { SocketActions } from '@/api/socketActions'
 import { parseFilamentMetadata, findUsedExtruders } from '@/util/parseFilamentMetadata'
@@ -13,12 +14,14 @@ import { consola } from 'consola'
  * @param filepath The file path (e.g., 'gcodes/folder/file.gcode')
  * @param fileSize The size of the file in bytes
  * @param chunkSize The size of each chunk in bytes (default: 5MB)
+ * @param onProgress Optional callback function called after each chunk is downloaded with the current progress in bytes
  * @returns The file content as a string
  */
 async function fetchFileWithByteRanges (
   filepath: string,
   fileSize: number,
-  chunkSize: number = 100 * 1024 * 1024
+  chunkSize: number = 100 * 1024 * 1024,
+  onProgress?: (progress: number) => void
 ): Promise<string> {
   if (!fileSize || fileSize <= 0) {
     throw new Error('File size must be greater than 0 for byte range requests')
@@ -38,6 +41,14 @@ async function fetchFileWithByteRanges (
           responseType: 'arraybuffer',
           headers: {
             Range: rangeHeader
+          },
+          onDownloadProgress: (event: AxiosProgressEvent) => {
+            if (onProgress) {
+              // Calculate cumulative progress: bytes from previous chunks + bytes from current chunk
+              const currentChunkProgress = event.loaded || 0
+              const totalProgress = Math.min(start + currentChunkProgress, fileSize)
+              onProgress(totalProgress)
+            }
           }
         }
       )
@@ -47,7 +58,14 @@ async function fetchFileWithByteRanges (
         throw new Error(`Failed to fetch chunk ${start}-${end}: ${chunkResponse.status}`)
       }
 
-      byteChunks.push(new Uint8Array(chunkResponse.data))
+      const chunk = new Uint8Array(chunkResponse.data)
+      byteChunks.push(chunk)
+
+      // Ensure progress is set to the end of this chunk
+      if (onProgress) {
+        const currentProgress = Math.min(start + chunk.length, fileSize)
+        onProgress(currentProgress)
+      }
     } catch (error) {
       consola.error(`Error fetching chunk ${start}-${end}:`, error)
       throw new Error(`Failed to fetch chunk ${start}-${end}: ${error instanceof Error ? error.message : String(error)}`)
@@ -93,6 +111,7 @@ export const actions: ActionTree<PrintJobState, RootState> = {
    */
   async loadFilamentMetadata ({ commit, dispatch }, file: AppFile | AppFileWithMeta) {
     commit('setLoading', true)
+    commit('setDownloadProgress', 0)
 
     try {
       // Build full file path
@@ -109,7 +128,17 @@ export const actions: ActionTree<PrintJobState, RootState> = {
         throw new Error('Cannot determine file size for range requests - file size is required')
       }
 
-      const gcodeContent = await fetchFileWithByteRanges(filepath, fileSize)
+      const gcodeContent = await fetchFileWithByteRanges(
+        filepath,
+        fileSize,
+        100 * 1024 * 1024,
+        (progress) => {
+          commit('setDownloadProgress', progress)
+        }
+      )
+
+      // Set progress to 100% when download completes
+      commit('setDownloadProgress', fileSize)
 
       // Step 1: Get configured filaments from Moonraker metadata (colors, types, vendor)
       // This is already in file.filament_colors, file.filament_type, etc.

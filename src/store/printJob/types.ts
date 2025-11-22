@@ -9,6 +9,7 @@ export interface PrintJobState {
   mappings: FilamentMapping[]
   settings: PrintJobSettings
   isLoading: boolean
+  downloadProgress: number
 }
 
 export interface PrintJobSettings {

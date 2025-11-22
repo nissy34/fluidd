@@ -38,6 +38,10 @@ export const mutations: MutationTree<PrintJobState> = {
     state.isLoading = loading
   },
 
+  setDownloadProgress (state, progress: number) {
+    state.downloadProgress = progress
+  },
+
   reset (state) {
     state.dialogOpen = false
     state.currentFile = null
@@ -49,5 +53,6 @@ export const mutations: MutationTree<PrintJobState> = {
       timeLapseCamera: false
     }
     state.isLoading = false
+    state.downloadProgress = 0
   }
 }
