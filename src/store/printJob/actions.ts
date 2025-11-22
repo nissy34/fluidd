@@ -18,7 +18,7 @@ import { consola } from 'consola'
 async function fetchFileWithByteRanges (
   filepath: string,
   fileSize: number,
-  chunkSize: number = 5 * 1024 * 1024
+  chunkSize: number = 100 * 1024 * 1024
 ): Promise<string> {
   if (!fileSize || fileSize <= 0) {
     throw new Error('File size must be greater than 0 for byte range requests')
