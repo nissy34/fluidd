@@ -75,7 +75,7 @@ export function autoMapFilaments (
     preferences: Array<{ slotIndex: number, distance: number, hasTypeMatch: boolean }>
   }
 
-  const preferences: ExtruderPreference[] = gcodeExtruders.map((gcode, extruderIndex) => {
+  const preferences: ExtruderPreference[] = gcodeExtruders.map((gcode) => {
     const prefs: Array<{ slotIndex: number, distance: number, hasTypeMatch: boolean }> = []
 
     const gcodeRgb = gcode.color ? hexToRgb(gcode.color) : null
@@ -101,7 +101,7 @@ export function autoMapFilaments (
     // Sort by distance (closest first) - all have matching materials
     prefs.sort((a, b) => a.distance - b.distance)
 
-    return { extruderIndex, extruder: gcode, preferences: prefs }
+    return { extruderIndex: gcode.index, extruder: gcode, preferences: prefs }
   })
 
   // Assign best match for each extruder (allows multiple G-code extruders to map to same slot)

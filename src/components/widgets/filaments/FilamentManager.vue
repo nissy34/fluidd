@@ -217,13 +217,4 @@ export default class FilamentManager extends Vue {
   padding: 12px !important;
 }
 
-@media (max-width: 960px) {
-  .filament-slots-row {
-    margin: 0 -4px;
-  }
-
-  .filament-slot-col {
-    padding: 4px !important;
-  }
-}
 </style>

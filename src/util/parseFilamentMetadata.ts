@@ -154,12 +154,17 @@ export function parseFilamentMetadata (gcodeContent: string): FilamentMetadata {
 
 /**
  * Convert hex color string to RGB object
- * @param hex - Hex color string like "#FF0000" or "FF0000"
+ * @param hex - Hex color string like "#FF0000", "FF0000", "#FF0000FF" (RGBA), or "FF0000FF"
  * @returns RGB object with r, g, b values (0-255)
  */
 export function hexToRgb (hex: string): { r: number, g: number, b: number } | null {
   const cleanHex = hex.replace('#', '')
-  const match = cleanHex.match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+
+  // Handle both 6-character RGB and 8-character RGBA formats
+  // For RGBA, strip the alpha channel (last 2 characters)
+  const rgbHex = cleanHex.length === 8 ? cleanHex.substring(0, 6) : cleanHex
+
+  const match = rgbHex.match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
 
   if (!match) return null
 

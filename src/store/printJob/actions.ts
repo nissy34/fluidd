@@ -119,7 +119,6 @@ export const actions: ActionTree<PrintJobState, RootState> = {
 
       // Step 2a: Find actually used extruders by scanning for T commands
       const usedExtruderIndices = findUsedExtruders(gcodeContent)
-      consola.info('Used extruders in G-code:', usedExtruderIndices)
 
       // Step 2b: Parse filament metadata for additional details
       const metadata = parseFilamentMetadata(gcodeContent)
@@ -129,18 +128,17 @@ export const actions: ActionTree<PrintJobState, RootState> = {
         extruder => usedExtruderIndices.includes(extruder.index)
       )
 
-      // Merge Moonraker metadata with parsed G-code metadata for used extruders
+      // Use parsed G-code metadata for used extruders
+      // We parse the file anyway, so the parsed metadata is complete and accurate
       const enrichedExtruders = usedExtruderIndices.map(index => {
-        const gcodeExtruder = filteredExtruders.find(e => e.index === index)
-        const fileMetadata = file as AppFileWithMeta
+        const gcodeExtruder = filteredExtruders.find(e => e.index === index) ||
+          metadata.extruders.find(e => e.index === index)
 
         return {
           index,
-          // Prefer Moonraker metadata, fallback to G-code parsing
-          color: fileMetadata.filament_colors?.[index] || gcodeExtruder?.color || null,
-          type: fileMetadata.filament_type?.[index] || gcodeExtruder?.type || null,
-          usageGrams: fileMetadata.filament_weights?.[index] || gcodeExtruder?.usageGrams || null,
-          // Vendor name is typically only in G-code comments, not Moonraker metadata
+          color: gcodeExtruder?.color || null,
+          type: gcodeExtruder?.type || null,
+          usageGrams: gcodeExtruder?.usageGrams || null,
           vendor: gcodeExtruder?.vendor || null
         }
       })
