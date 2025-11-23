@@ -234,6 +234,10 @@ export default class FilamentSlot extends Vue {
   flex-shrink: 0;
   width: 100%;
   max-width: 100%;
+
+  ::v-deep .v-avatar {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  }
 }
 
 // Material Type Badge - middle
