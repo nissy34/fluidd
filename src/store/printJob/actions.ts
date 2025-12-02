@@ -207,7 +207,7 @@ export const actions: ActionTree<PrintJobState, RootState> = {
       for (const mapping of state.mappings) {
         if (mapping.printerSlotIndex !== null) {
           const mapCmd = `SET_PRINT_EXTRUDER_MAP CONFIG_EXTRUDER=${mapping.gcodeExtruderIndex} MAP_EXTRUDER=${mapping.printerSlotIndex}`
-          SocketActions.printerGcodeScript(mapCmd)
+          await SocketActions.printerGcodeScript(mapCmd)
           consola.info(`Mapping G-code T${mapping.gcodeExtruderIndex} → Printer slot ${mapping.printerSlotIndex}`)
         }
       }
@@ -222,13 +222,13 @@ export const actions: ActionTree<PrintJobState, RootState> = {
 
       if (activeSlots) {
         const usedCmd = `SET_PRINT_USED_EXTRUDERS EXTRUDERS=${activeSlots}`
-        SocketActions.printerGcodeScript(usedCmd)
+        await SocketActions.printerGcodeScript(usedCmd)
         consola.info(`Activating printer slots: ${activeSlots}`)
       }
 
       // 3. Set print preferences
       const preferences = `SET_PRINT_PREFERENCES BED_LEVEL=${state.settings.autoBedLeveling ? 1 : 0} FLOW_CALIBRATE=${state.settings.flowCalibrate ? 1 : 0} TIME_LAPSE_CAMERA=${state.settings.timeLapseCamera ? 1 : 0}`
-      SocketActions.printerGcodeScript(preferences)
+      await SocketActions.printerGcodeScript(preferences)
 
       // 4. Start the print
       if (state.currentFile) {

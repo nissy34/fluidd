@@ -144,7 +144,7 @@ export default class CameraMixin extends Vue {
         if (!document.hidden) {
           this.startPlayback()
         }
-      }, 2000)
+      }, 10)
     }
   }
 
