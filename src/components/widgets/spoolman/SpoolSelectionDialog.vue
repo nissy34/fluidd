@@ -158,6 +158,16 @@
               </div>
             </template>
 
+            <template #[`item-value.afc_loaded_lane`]="{ value }">
+              <v-chip
+                v-if="value != null"
+                color="primary"
+                small
+              >
+                {{ $filters.prettyCase(value ?? '') }}
+              </v-chip>
+            </template>
+
             <template #[`item-value.initial_weight`]="{ value }">
               {{ $filters.getReadableWeightString(value) }}
             </template>
@@ -272,25 +282,28 @@
 <script lang="ts">
 import { Component, Mixins, Watch } from 'vue-property-decorator'
 import StateMixin from '@/mixins/state'
+import AfcMixin from '@/mixins/afc'
 import { SocketActions } from '@/api/socketActions'
 import type { Spool } from '@/store/spoolman/types'
 import BrowserMixin from '@/mixins/browser'
 import QRReader from '@/components/widgets/spoolman/QRReader.vue'
-import type { WebcamConfig } from '@/store/webcams/types'
 import QrScanner from 'qr-scanner'
 import type { AppDataTableHeader } from '@/types'
 import getFilePaths from '@/util/get-file-paths'
 import type { DataTableHeader } from 'vuetify'
-import type { KlipperPrinterConfig } from '@/store/printer/types'
 import type { AppFileWithMeta } from '@/store/files/types'
 import type { SpoolmanRemainingFilamentUnit } from '@/store/config/types'
+
+type SpoolWithAfcLoadedLane = Spool & {
+  afc_loaded_lane?: string
+}
 
 @Component({
   components: {
     QRReader
   }
 })
-export default class SpoolSelectionDialog extends Mixins(StateMixin, BrowserMixin) {
+export default class SpoolSelectionDialog extends Mixins(StateMixin, BrowserMixin, AfcMixin) {
   search = ''
   selectedSpoolId: number | null = null
 
@@ -343,11 +356,19 @@ export default class SpoolSelectionDialog extends Mixins(StateMixin, BrowserMixi
     })
   }
 
-  get availableSpools () {
+  get availableSpools (): SpoolWithAfcLoadedLane[] {
     const availableSpools: Spool[] = this.$typedGetters['spoolman/getAvailableSpools']
+
+    const afcLoadedSpools = this.afc != null
+      ? this.afcLoadedSpools
+      : {}
 
     return availableSpools
       .filter(x => !x.archived)
+      .map(spool => ({
+        ...spool,
+        afc_loaded_lane: afcLoadedSpools[spool.id]
+      } satisfies SpoolWithAfcLoadedLane))
   }
 
   get currency (): string | null {
@@ -355,12 +376,23 @@ export default class SpoolSelectionDialog extends Mixins(StateMixin, BrowserMixi
   }
 
   get configurableHeaders (): AppDataTableHeader[] {
+    const afcHeaders: AppDataTableHeader[] = this.afc != null
+      ? [
+          {
+            text: this.$tc('app.afc.LaneLoaded'),
+            value: 'afc_loaded_lane',
+            cellClass: 'text-no-wrap'
+          }
+        ]
+      : []
+
     const headers: AppDataTableHeader[] = [
       {
         text: this.$tc('app.spoolman.label.id'),
         value: 'id',
         cellClass: 'text-no-wrap'
       },
+      ...afcHeaders,
       {
         text: this.$tc('app.spoolman.label.material'),
         value: 'filament.material',
@@ -463,7 +495,7 @@ export default class SpoolSelectionDialog extends Mixins(StateMixin, BrowserMixi
         text: this.$tc('app.spoolman.label.last_used'),
         value: 'last_used',
         cellClass: 'text-no-wrap'
-      },
+      }
     ]
 
     const mergedTableHeaders: AppDataTableHeader[] = this.$typedGetters['config/getMergedTableHeaders'](headers, 'spoolman')
@@ -510,12 +542,12 @@ export default class SpoolSelectionDialog extends Mixins(StateMixin, BrowserMixi
     return this.$typedState.spoolman.dialog.targetMacro
   }
 
-  get enabledWebcams (): WebcamConfig[] {
+  get enabledWebcams (): Moonraker.Webcam.Entry[] {
     return this.$typedGetters['webcams/getEnabledWebcams']
   }
 
-  get availableCameras (): Pick<WebcamConfig, 'uid' | 'name'>[] {
-    const cameras: Pick<WebcamConfig, 'uid' | 'name'>[] = this.enabledWebcams
+  get availableCameras (): Pick<Moonraker.Webcam.Entry, 'uid' | 'name'>[] {
+    const cameras: Pick<Moonraker.Webcam.Entry, 'uid' | 'name'>[] = this.enabledWebcams
       .filter(camera => camera.service !== 'iframe')
 
     if (this.hasDeviceCamera) {
@@ -581,7 +613,7 @@ export default class SpoolSelectionDialog extends Mixins(StateMixin, BrowserMixi
         `SET_GCODE_VARIABLE MACRO=${this.targetMacro} VARIABLE=spool_id VALUE=${this.selectedSpoolId ?? 'None'}`
       ]
 
-      const printerConfig: KlipperPrinterConfig = this.$typedGetters['printer/getPrinterConfig']
+      const printerConfig: Klipper.ConfigState = this.$typedGetters['printer/getPrinterConfig']
       const supportsSaveVariables = printerConfig.save_variables
       if (supportsSaveVariables) {
         // persist selected spool across restarts

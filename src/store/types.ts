@@ -26,6 +26,7 @@ import type { sensors } from './sensors'
 import type { database } from './database'
 import type { analysis } from './analysis'
 import type { printJob } from './printJob'
+import type { afc } from './afc'
 import type { storeOptions } from '.'
 
 type RootModulesType = {
@@ -55,7 +56,8 @@ type RootModulesType = {
   sensors: typeof sensors,
   database: typeof database,
   analysis: typeof analysis,
-  printJob: typeof printJob
+  printJob: typeof printJob,
+  afc: typeof afc
 }
 
 type RootStateType = {

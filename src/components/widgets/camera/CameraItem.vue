@@ -112,17 +112,16 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch, Ref } from 'vue-property-decorator'
-import type { WebcamConfig } from '@/store/webcams/types'
 import type { CameraFullscreenAction } from '@/store/config/types'
 import { CameraComponents } from '@/dynamicImports'
-import CameraMixin from '@/mixins/camera'
+import type CameraMixin from '@/mixins/camera'
 import type { CameraConnectionStatus, CameraNameMenuItem } from '@/types'
 import { startCase } from 'lodash-es'
 
 @Component({})
 export default class CameraItem extends Vue {
   @Prop({ type: Object, required: true })
-  readonly camera!: WebcamConfig
+  readonly camera!: Moonraker.Webcam.Entry
 
   @Prop({ type: Boolean })
   readonly fullscreen?: boolean

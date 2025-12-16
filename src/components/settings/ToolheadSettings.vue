@@ -83,7 +83,8 @@
             :rules="[
               $rules.lengthGreaterThanOrEqual(1),
               $rules.lengthLessThanOrEqual(6),
-              $rules.numberArrayValid
+              $rules.numberArrayValid,
+              $rules.numberArrayGreaterThan(0)
             ]"
           />
         </app-setting>
@@ -127,7 +128,8 @@
             :rules="[
               $rules.lengthGreaterThanOrEqual(1),
               $rules.lengthLessThanOrEqual(3),
-              $rules.numberArrayValid
+              $rules.numberArrayValid,
+              $rules.numberArrayGreaterThan(0)
             ]"
           />
         </app-setting>
@@ -150,7 +152,8 @@
             :rules="[
               $rules.lengthGreaterThanOrEqual(1),
               $rules.lengthLessThanOrEqual(3),
-              $rules.numberArrayValid
+              $rules.numberArrayValid,
+              $rules.numberArrayGreaterThan(0)
             ]"
           />
         </app-setting>
@@ -175,7 +178,8 @@
             :rules="[
               $rules.lengthGreaterThanOrEqual(4),
               $rules.lengthLessThanOrEqual(4),
-              $rules.numberArrayValid
+              $rules.numberArrayValid,
+              $rules.numberArrayGreaterThan(0)
             ]"
           />
         </app-setting>
@@ -198,7 +202,8 @@
             :rules="[
               $rules.lengthGreaterThanOrEqual(4),
               $rules.lengthLessThanOrEqual(4),
-              $rules.numberArrayValid
+              $rules.numberArrayValid,
+              $rules.numberArrayGreaterThan(0)
             ]"
           />
         </app-setting>
@@ -217,7 +222,7 @@
       </template>
 
       <app-setting :title="$t('app.setting.label.default_toolhead_xy_speed')">
-        <v-text-field
+        <app-text-field
           :value="defaultToolheadXYSpeed"
           :rules="[
             $rules.required,
@@ -229,14 +234,15 @@
           single-line
           hide-details="auto"
           suffix="mm/s"
-          @change="setDefaultToolheadYXSpeed"
+          submit-on-change
+          @submit="setDefaultToolheadXYSpeed"
         />
       </app-setting>
 
       <v-divider />
 
       <app-setting :title="$t('app.setting.label.default_toolhead_z_speed')">
-        <v-text-field
+        <app-text-field
           :value="defaultToolheadZSpeed"
           :rules="[
             $rules.required,
@@ -248,7 +254,8 @@
           single-line
           hide-details="auto"
           suffix="mm/s"
-          @change="setDefaultToolheadZSpeed"
+          submit-on-change
+          @submit="setDefaultToolheadZSpeed"
         />
       </app-setting>
 
@@ -270,7 +277,8 @@
           :rules="[
             $rules.lengthGreaterThanOrEqual(1),
             $rules.lengthLessThanOrEqual(4),
-            $rules.numberArrayValid
+            $rules.numberArrayValid,
+            $rules.numberArrayGreaterThan(0)
           ]"
         />
       </app-setting>
@@ -278,7 +286,7 @@
       <v-divider />
 
       <app-setting :title="$t('app.setting.label.default_extrude_length')">
-        <v-text-field
+        <app-text-field
           :value="defaultExtrudeLength"
           :rules="[
             $rules.required,
@@ -290,14 +298,15 @@
           single-line
           hide-details="auto"
           suffix="mm"
-          @change="setDefaultExtrudeLength"
+          submit-on-change
+          @submit="setDefaultExtrudeLength"
         />
       </app-setting>
 
       <v-divider />
 
       <app-setting :title="$t('app.setting.label.default_extrude_speed')">
-        <v-text-field
+        <app-text-field
           :value="defaultExtrudeSpeed"
           :rules="[
             $rules.required,
@@ -309,7 +318,8 @@
           single-line
           hide-details="auto"
           suffix="mm/s"
-          @change="setDefaultExtrudeSpeed"
+          submit-on-change
+          @submit="setDefaultExtrudeSpeed"
         />
       </app-setting>
 
@@ -383,32 +393,31 @@
 <script lang="ts">
 import { Component, Ref, Mixins } from 'vue-property-decorator'
 import { defaultState } from '@/store/config/state'
-import type { VInput } from '@/types'
+import type { VCombobox } from 'vuetify/lib'
 import ToolheadMixin from '@/mixins/toolhead'
 import type { GeneralConfig, ToolheadControlStyle } from '@/store/config/types'
-import type { KlipperPrinterSettings } from '@/store/printer/types'
 
 @Component({
   components: {}
 })
 export default class ToolHeadSettings extends Mixins(ToolheadMixin) {
   @Ref('toolheadMoveDistances')
-  readonly toolheadMoveDistancesElement!: VInput
+  readonly toolheadMoveDistancesElement!: VCombobox
 
   @Ref('toolheadXYMoveDistances')
-  readonly toolheadXYMoveDistancesElement!: VInput
+  readonly toolheadXYMoveDistancesElement!: VCombobox
 
   @Ref('toolheadZMoveDistances')
-  readonly toolheadZMoveDistancesElement!: VInput
+  readonly toolheadZMoveDistancesElement!: VCombobox
 
   @Ref('toolheadCircleXYMoveDistances')
-  readonly toolheadCircleXYMoveDistancesElement!: VInput
+  readonly toolheadCircleXYMoveDistancesElement!: VCombobox
 
   @Ref('toolheadCircleZMoveDistances')
-  readonly toolheadCircleZMoveDistancesElement!: VInput
+  readonly toolheadCircleZMoveDistancesElement!: VCombobox
 
   @Ref('zAdjustValues')
-  readonly zAdjustValuesElement!: VInput
+  readonly zAdjustValuesElement!: VCombobox
 
   get defaultExtrudeSpeed (): number {
     return this.$typedState.config.uiSettings.general.defaultExtrudeSpeed
@@ -450,7 +459,7 @@ export default class ToolHeadSettings extends Mixins(ToolheadMixin) {
     return this.$typedState.config.uiSettings.general.defaultToolheadXYSpeed
   }
 
-  setDefaultToolheadYXSpeed (value: number) {
+  setDefaultToolheadXYSpeed (value: number) {
     this.$typedDispatch('config/saveByPath', {
       path: 'uiSettings.general.defaultToolheadXYSpeed',
       value: +value,
@@ -663,7 +672,7 @@ export default class ToolHeadSettings extends Mixins(ToolheadMixin) {
   }
 
   get printerSupportsForceMove (): boolean {
-    const printerSettings: KlipperPrinterSettings = this.$typedGetters['printer/getPrinterSettings']
+    const printerSettings: Klipper.SettingsState = this.$typedGetters['printer/getPrinterSettings']
 
     return printerSettings.force_move?.enable_force_move ?? false
   }

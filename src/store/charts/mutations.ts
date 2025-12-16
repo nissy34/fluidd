@@ -38,6 +38,7 @@ export const mutations = {
    */
   setChartStore (state, payload: ChartData[]) {
     state.chart = payload
+      .map(entry => Object.freeze(entry))
     state.ready = true
   },
 
@@ -49,7 +50,7 @@ export const mutations = {
     if (!state[payload.type]) {
       Vue.set(state, payload.type, [])
     }
-    state[payload.type].push(payload.data)
+    state[payload.type].push(Object.freeze(payload.data))
     const firstInRange = state[payload.type].findIndex((entry: ChartData) => (Date.now() - entry.date.valueOf()) / 1000 < payload.retention)
     if (firstInRange > 0) state[payload.type].splice(0, firstInRange)
   },

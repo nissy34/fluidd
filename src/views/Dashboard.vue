@@ -58,7 +58,7 @@ import SensorsCard from '@/components/widgets/sensors/SensorsCard.vue'
 import RunoutSensorsCard from '@/components/widgets/runout-sensors/RunoutSensorsCard.vue'
 import BeaconCard from '@/components/widgets/beacon/BeaconCard.vue'
 import FilamentManager from '@/components/widgets/filaments/FilamentManager.vue'
-import type { KlipperPrinterSettings } from '@/store/printer/types'
+import AfcCard from '@/components/widgets/afc/AfcCard.vue'
 
 @Component({
   components: {
@@ -80,7 +80,8 @@ import type { KlipperPrinterSettings } from '@/store/printer/types'
     SensorsCard,
     RunoutSensorsCard,
     BeaconCard,
-    FilamentManager
+    FilamentManager,
+    AfcCard
   }
 })
 export default class Dashboard extends Mixins(StateMixin) {
@@ -105,7 +106,7 @@ export default class Dashboard extends Mixins(StateMixin) {
     return 12 / this.columnCount
   }
 
-  get printerSettings (): KlipperPrinterSettings {
+  get printerSettings (): Klipper.SettingsState {
     return this.$typedGetters['printer/getPrinterSettings']
   }
 
@@ -155,6 +156,10 @@ export default class Dashboard extends Mixins(StateMixin) {
 
   get supportsFilaments (): boolean {
     return this.$typedGetters['server/isSnapmakerU1']
+  }
+
+  get supportsAfc (): boolean {
+    return this.$typedGetters['printer/getSupportsAfc']
   }
 
   get hasMacros (): boolean {
@@ -233,6 +238,7 @@ export default class Dashboard extends Mixins(StateMixin) {
     if (item.id === 'sensors-card' && !this.hasSensors) return true
     if (item.id === 'temperature-card' && !this.hasHeatersOrTemperatureSensors) return true
     if (item.id === 'filament-manager' && !this.supportsFilaments) return true
+    if (item.id === 'afc-card' && !this.supportsAfc) return true
 
     // Otherwise return the opposite of whatever the enabled state is.
     return !item.enabled

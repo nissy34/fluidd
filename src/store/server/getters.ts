@@ -1,5 +1,5 @@
 import type { GetterTree } from 'vuex'
-import type { ServerState, ServiceInfo, ServiceState } from './types'
+import type { ServerState, ServiceInfo } from './types'
 import type { RootState } from '../types'
 import { Globals } from '@/globals'
 import { gte, valid } from 'semver'
@@ -30,7 +30,7 @@ export const getters = {
    */
   getServices: (state): ServiceInfo[] => {
     const available_services: string[] = state.system_info?.available_services || []
-    const service_states: ServiceState = state.system_info?.service_state || {}
+    const service_states: Moonraker.Machine.ServiceState = state.system_info?.service_state || {}
 
     const services: ServiceInfo[] = [...available_services].sort().map((name: string) => {
       return name in service_states
@@ -85,7 +85,8 @@ export const getters = {
    * Check if the printer is a Snapmaker U1
    */
   isSnapmakerU1: (state, getters, rootState): boolean => {
-    const machineType: string | undefined = rootState.server.system_info?.product_info?.machine_type
+    const systemInfo = rootState.server.system_info as (Moonraker.Machine.SystemInfo & { product_info?: { machine_type?: string } }) | null
+    const machineType: string | undefined = systemInfo?.product_info?.machine_type
     return machineType?.toLowerCase() === 'snapmaker u1'
   }
 } satisfies GetterTree<ServerState, RootState>
