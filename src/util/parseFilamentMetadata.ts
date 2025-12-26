@@ -14,7 +14,7 @@ export interface FilamentMetadata {
 }
 
 export interface ExtruderMetadata {
-  index: number           // G-code extruder index (0, 1, 2, 3)
+  index: number           // G-code extruder index (0, 1, 2, 3, ...)
   color: string | null    // Hex color like "#FF0000" or null if not found
   type: string | null     // Material type like "PLA", "PETG", "ABS" or null
   usageGrams: number | null  // Filament usage in grams or null
@@ -119,9 +119,9 @@ export function parseFilamentMetadata (gcodeContent: string): FilamentMetadata {
   }
 
   // Build extruder metadata array based on metadata found, not T commands
-  // Limit to 4 extruders max (Snapmaker J1 has 4 slots)
+  // Parse all available metadata to support files with any number of extruders
   const extruders: ExtruderMetadata[] = []
-  const maxExtruders = Math.min(Math.max(colors.length, types.length, usages.length), 4)
+  const maxExtruders = Math.max(colors.length, types.length, usages.length)
 
   for (let i = 0; i < maxExtruders; i++) {
     extruders.push({
@@ -204,7 +204,7 @@ export function findUsedExtruders (gcodeContent: string): number[] {
     const tMatch = trimmed.match(/^T(\d+)(?:\s|$|;)/)
     if (tMatch) {
       const extruderIndex = parseInt(tMatch[1], 10)
-      if (extruderIndex >= 0 && extruderIndex < 10) { // Max 10 extruders
+      if (extruderIndex >= 0 && extruderIndex < 32) { // Max 32 extruders (matches buildExtruderMapTable)
         usedExtruders.add(extruderIndex)
       }
     }
