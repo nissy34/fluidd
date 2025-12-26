@@ -2,7 +2,6 @@ import Vue from 'vue'
 import { Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator'
 import { consola } from 'consola'
 import type { CameraConnectionStatus, CameraNameMenuItem } from '@/types'
-import { SocketActions } from '@/api/socketActions'
 
 @Component
 export default class CameraMixin extends Vue {
@@ -22,7 +21,6 @@ export default class CameraMixin extends Vue {
   cameraNameMenuItems: CameraNameMenuItem[] = []
   framesPerSecond = -1
   rawCameraUrl = ''
-  retryTimeoutId: number | null = null
 
   @Watch('camera')
   onCamera () {
@@ -109,16 +107,13 @@ export default class CameraMixin extends Vue {
     this.animating = false
     document.removeEventListener('visibilitychange', this.checkPlayback)
     this.stopPlayback()
-    SocketActions.cameraStopMonitor()
   }
 
   checkPlayback () {
     if (!document.hidden) {
-      SocketActions.cameraStartMonitor()
       this.startPlayback()
     } else {
       this.stopPlayback()
-      SocketActions.cameraStopMonitor()
     }
   }
 
@@ -130,21 +125,7 @@ export default class CameraMixin extends Vue {
 
   @Emit('update:status')
   updateStatus (status: CameraConnectionStatus) {
-    const previousStatus = this.status
     this.status = status
-
-    if (status === 'error' && (previousStatus === 'connecting' || previousStatus === 'connected')) {
-      if (this.retryTimeoutId !== null) {
-        clearTimeout(this.retryTimeoutId)
-      }
-
-      this.retryTimeoutId = window.setTimeout(() => {
-        this.retryTimeoutId = null
-        if (!document.hidden) {
-          this.startPlayback()
-        }
-      }, 10)
-    }
   }
 
   @Emit('update:camera-name')
@@ -172,10 +153,7 @@ export default class CameraMixin extends Vue {
   }
 
   stopPlayback () {
-    if (this.retryTimeoutId !== null) {
-      clearTimeout(this.retryTimeoutId)
-      this.retryTimeoutId = null
-    }
+    // noop
   }
 
   menuItemClick (item: CameraNameMenuItem) {

@@ -16,26 +16,6 @@ const baseEmit = async <T = unknown>(method: string, options: NotifyOptions): Pr
 }
 
 export const SocketActions = {
-  cameraStartMonitor (options?: NotifyOptions) {
-    return baseEmit<Moonraker.OkResponse>(
-      'camera.start_monitor', {
-        dispatch: 'void',
-        ...options,
-        params: { domain: 'lan', interval: 0 }
-      }
-    )
-  },
-
-  cameraStopMonitor (options?: NotifyOptions) {
-    return baseEmit<Moonraker.OkResponse>(
-      'camera.stop_monitor', {
-        dispatch: 'void',
-        ...options,
-        params: { domain: 'lan' }
-      }
-    )
-  },
-
   machineServicesRestart (service: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'machine.services.restart', {
