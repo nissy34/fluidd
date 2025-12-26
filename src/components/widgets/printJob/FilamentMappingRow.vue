@@ -154,7 +154,9 @@ export default class FilamentMappingRow extends Vue {
           value: i,
           text: `${this.$t('app.general.label.slot')} ${i + 1}`,
           color: slot.colorRgba ? rgbaToHex(slot.colorRgba) : null,
-          details: slot.vendor && slot.type ? `${slot.vendor} ${slot.type}` : slot.type,
+          details: slot.vendor && slot.type
+            ? `${slot.vendor} ${slot.type}${slot.subType && slot.subType.trim() ? ` ${slot.subType}` : ''}`
+            : slot.type,
           isCompatible
         })
       }
