@@ -1249,6 +1249,8 @@ app:
   sensors:
     title:
       sensors: Sensors
+  u1_screen:
+    title: U1 Screen
   keyboard_shortcuts:
     title:
       keyboard_shortcuts: Keyboard Shortcuts

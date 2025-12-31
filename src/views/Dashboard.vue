@@ -59,6 +59,7 @@ import RunoutSensorsCard from '@/components/widgets/runout-sensors/RunoutSensors
 import BeaconCard from '@/components/widgets/beacon/BeaconCard.vue'
 import FilamentManager from '@/components/widgets/filaments/FilamentManager.vue'
 import AfcCard from '@/components/widgets/afc/AfcCard.vue'
+import U1ScreenCard from '@/components/widgets/u1-screen/U1ScreenCard.vue'
 
 @Component({
   components: {
@@ -81,7 +82,8 @@ import AfcCard from '@/components/widgets/afc/AfcCard.vue'
     RunoutSensorsCard,
     BeaconCard,
     FilamentManager,
-    AfcCard
+    AfcCard,
+    U1ScreenCard
   }
 })
 export default class Dashboard extends Mixins(StateMixin) {
@@ -162,6 +164,10 @@ export default class Dashboard extends Mixins(StateMixin) {
     return this.$typedGetters['printer/getSupportsAfc']
   }
 
+  get supportsU1Screen (): boolean {
+    return this.$typedGetters['server/supportsU1Screen']
+  }
+
   get hasMacros (): boolean {
     return this.$typedGetters['macros/getVisibleMacros'].length > 0
   }
@@ -239,6 +245,7 @@ export default class Dashboard extends Mixins(StateMixin) {
     if (item.id === 'temperature-card' && !this.hasHeatersOrTemperatureSensors) return true
     if (item.id === 'filament-manager' && !this.supportsFilaments) return true
     if (item.id === 'afc-card' && !this.supportsAfc) return true
+    if (item.id === 'u1-screen-card' && !this.supportsU1Screen) return true
 
     // Otherwise return the opposite of whatever the enabled state is.
     return !item.enabled

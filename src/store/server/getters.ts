@@ -88,5 +88,12 @@ export const getters = {
     const systemInfo = rootState.server.system_info as (Moonraker.Machine.SystemInfo & { product_info?: { machine_type?: string } }) | null
     const machineType: string | undefined = systemInfo?.product_info?.machine_type
     return machineType?.toLowerCase() === 'snapmaker u1'
+  },
+
+  /**
+   * Check if U1 screen is supported
+   */
+  supportsU1Screen: (state, getters): boolean => {
+    return getters.isSnapmakerU1
   }
 } satisfies GetterTree<ServerState, RootState>
