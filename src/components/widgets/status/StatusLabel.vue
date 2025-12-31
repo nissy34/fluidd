@@ -1,12 +1,12 @@
 <template>
   <v-layout align-center>
     <span
+      v-safe-html="label"
       class="label body-2 secondary--text"
       :style="{
         width: $filters.getPixelsString(labelWidth),
         'min-width': $filters.getPixelsString(labelWidth)
       }"
-      v-html="label"
     />
     <span class="value"><slot /></span>
     <span

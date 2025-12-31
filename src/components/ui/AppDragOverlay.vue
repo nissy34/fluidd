@@ -23,7 +23,7 @@
           >
             {{ icon }}
           </v-icon>
-          <span v-html="message" />
+          <span v-safe-html="message" />
         </v-col>
       </v-row>
     </v-container>

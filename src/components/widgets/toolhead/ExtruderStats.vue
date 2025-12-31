@@ -33,26 +33,26 @@
           :class="{ 'text--disabled': !klippyReady }"
         >
           <p
-            v-html="$t('app.tool.label.stats_active_extruder', {
+            v-safe-html="$t('app.tool.label.stats_active_extruder', {
               filamentDiameter,
               nozzleDiameter
             })"
           />
           <p
-            v-html="$t('app.tool.label.stats_volumetric_flow', {
+            v-safe-html="$t('app.tool.label.stats_volumetric_flow', {
               extrudeSpeed,
               estimatedVolumetricFlow
             })"
           />
           <p
-            v-html="$t('app.tool.label.stats_extruded_length', {
+            v-safe-html="$t('app.tool.label.stats_extruded_length', {
               extrudeLength,
               extrudeFactor: (extrudeFactor * 100).toFixed(),
               estimatedExtrudedLength
             })"
           />
           <p
-            v-html="$t('app.tool.label.stats_max_speed', {
+            v-safe-html="$t('app.tool.label.stats_max_speed', {
               layerHeight,
               estimatedMaxSpeed
             })"

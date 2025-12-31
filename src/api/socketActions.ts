@@ -19,7 +19,6 @@ export const SocketActions = {
   machineServicesRestart (service: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'machine.services.restart', {
-        dispatch: 'void',
         wait: Waits.onServiceRestart,
         ...options,
         params: {
@@ -32,7 +31,6 @@ export const SocketActions = {
   machineServicesStart (service: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'machine.services.start', {
-        dispatch: 'void',
         wait: Waits.onServiceStart,
         ...options,
         params: {
@@ -45,7 +43,6 @@ export const SocketActions = {
   machineServicesStop (service: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'machine.services.stop', {
-        dispatch: 'void',
         wait: Waits.onServiceStop,
         ...options,
         params: {
@@ -58,7 +55,6 @@ export const SocketActions = {
   machineReboot (options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'machine.reboot', {
-        dispatch: 'void',
         ...options
       }
     )
@@ -67,7 +63,6 @@ export const SocketActions = {
   machineShutdown (options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'machine.shutdown', {
-        dispatch: 'void',
         ...options
       }
     )
@@ -326,7 +321,6 @@ export const SocketActions = {
   printerRestart (options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'printer.restart', {
-        dispatch: 'void',
         wait: Waits.onKlipperRestart,
         ...options
       }
@@ -336,7 +330,6 @@ export const SocketActions = {
   printerFirmwareRestart (options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'printer.firmware_restart', {
-        dispatch: 'void',
         wait: Waits.onKlipperFirmwareRestart,
         ...options
       }
@@ -389,7 +382,6 @@ export const SocketActions = {
   printerPrintStart (path: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'printer.print.start', {
-        dispatch: 'void',
         ...options,
         params: {
           filename: path
@@ -452,7 +444,6 @@ export const SocketActions = {
   printerEmergencyStop (options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'printer.emergency_stop', {
-        dispatch: 'void',
         ...options
       }
     )
@@ -467,7 +458,7 @@ export const SocketActions = {
     )
   },
 
-  serverConnectionIdentify (params?: { client_name: string, version: string, type: string, url: string }, options?: NotifyOptions) {
+  serverConnectionIdentify (params?: { client_name: string, version: string, type: string, url: string, access_token?: string, api_key?: string }, options?: NotifyOptions) {
     return baseEmit<Moonraker.Websocket.ConnectionIdentifyResponse>(
       'server.connection.identify', {
         dispatch: 'socket/onConnectionId',
@@ -583,7 +574,6 @@ export const SocketActions = {
   serverRestart (options?: NotifyOptions) {
     return baseEmit<Moonraker.OkResponse>(
       'server.restart', {
-        dispatch: 'void',
         ...options
       }
     )
@@ -778,7 +768,6 @@ export const SocketActions = {
   serverFilesMove (source: string, dest: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.Files.ChangeResponse>(
       'server.files.move', {
-        dispatch: 'void',
         wait: `${Waits.onFileSystem}/${source}/`,
         ...options,
         params: {
@@ -792,7 +781,6 @@ export const SocketActions = {
   serverFilesCopy (source: string, dest: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.Files.ChangeResponse>(
       'server.files.copy', {
-        dispatch: 'void',
         wait: `${Waits.onFileSystem}/${source}/`,
         ...options,
         params: {
@@ -806,7 +794,6 @@ export const SocketActions = {
   serverFilesZip (dest: string, items: string[], store_only?: boolean, options?: NotifyOptions) {
     return baseEmit<Moonraker.Files.ZipResponse>(
       'server.files.zip', {
-        dispatch: 'void',
         wait: `${Waits.onFileSystem}/${dest}/`,
         ...options,
         params: {
@@ -825,7 +812,6 @@ export const SocketActions = {
   serverFilesPostDirectory (path: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.Files.ChangeResponse>(
       'server.files.post_directory', {
-        dispatch: 'void',
         wait: `${Waits.onFileSystem}/${path}/`,
         ...options,
         params: {
@@ -838,7 +824,6 @@ export const SocketActions = {
   serverFilesDeleteFile (path: string, options?: NotifyOptions) {
     return baseEmit<Moonraker.Files.ChangeResponse>(
       'server.files.delete_file', {
-        dispatch: 'void',
         wait: `${Waits.onFileSystem}/${path}`,
         ...options,
         params: {
@@ -851,7 +836,6 @@ export const SocketActions = {
   serverFilesDeleteDirectory (path: string, force = false, options?: NotifyOptions) {
     return baseEmit<Moonraker.Files.ChangeResponse>(
       'server.files.delete_directory', {
-        dispatch: 'void',
         wait: `${Waits.onFileSystem}/${path}/`,
         ...options,
         params: {
@@ -874,7 +858,6 @@ export const SocketActions = {
   serverAnnouncementsDismiss (entry_id: string, wake_time?: number, options?: NotifyOptions) {
     return baseEmit<Moonraker.Announcements.DismissResponse>(
       'server.announcements.dismiss', {
-        dispatch: 'void',
         ...options,
         params: {
           entry_id,
@@ -950,7 +933,6 @@ export const SocketActions = {
     return baseEmit<Moonraker.Analysis.EstimateResponse>(
       'server.analysis.estimate', {
         wait: `${Waits.onFileSystem}/gcodes/${filename}`,
-        dispatch: 'void',
         ...options,
         params: {
           filename,

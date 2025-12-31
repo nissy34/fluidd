@@ -16,7 +16,7 @@
       </v-icon>
     </template>
     <slot>
-      <span v-html="tooltip" />
+      <span v-safe-html="tooltip" />
     </slot>
   </v-tooltip>
 </template>

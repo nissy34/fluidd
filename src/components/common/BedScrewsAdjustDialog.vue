@@ -47,7 +47,7 @@
       </v-row>
       <v-row>
         <v-col class="text-subtitle-1 text-center">
-          <span v-html="$t('app.general.msg.bed_screws_adjust')" />
+          <span v-safe-html="$t('app.general.msg.bed_screws_adjust')" />
         </v-col>
       </v-row>
 

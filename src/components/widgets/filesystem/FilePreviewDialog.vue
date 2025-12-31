@@ -34,8 +34,8 @@
 
       <div
         v-else-if="renderedMarkdown"
+        v-safe-html="renderedMarkdown"
         class="markdown-container"
-        v-html="renderedMarkdown"
       />
     </v-card-text>
 

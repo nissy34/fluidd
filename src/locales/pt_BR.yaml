@@ -750,3 +750,12 @@ app:
       help: Enfileirar trabalhos arrastando arquivos dos trabalhos e soltando-os
         aqui<br>Ajuste a ordem dos trabalhos enfileirados arrastando-os para 
         cima ou para baixo
+  afc:
+    Calibrate: Calibrar
+    Cancel: Cancelar
+    Empty: Vazio
+    Error: Erro
+  keyboard_shortcuts:
+    label:
+      pause: Pausar
+      printing: Imprimindo

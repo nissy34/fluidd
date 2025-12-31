@@ -14,7 +14,7 @@
         @submit.prevent="handleLogin"
       >
         <div class="text-center">
-          <p v-html="$t('app.general.msg.welcome_back')" />
+          <p v-safe-html="$t('app.general.msg.welcome_back')" />
 
           <v-alert
             v-if="error"

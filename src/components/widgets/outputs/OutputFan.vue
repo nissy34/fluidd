@@ -30,8 +30,8 @@
           class="mr-2"
         >{{ rpm }}</small>
         <span
+          v-safe-html="prettyValue"
           class="focus--text"
-          v-html="prettyValue"
         />
       </div>
     </v-layout>

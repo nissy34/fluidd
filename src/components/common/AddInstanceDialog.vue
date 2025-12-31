@@ -9,7 +9,7 @@
     @save="addInstance"
   >
     <v-card-text>
-      <span v-html="helpTxt" />
+      <span v-safe-html="helpTxt" />
 
       <v-text-field
         v-model="url"
@@ -50,17 +50,17 @@
 
       <v-alert
         v-if="error"
+        v-safe-html="error"
         dense
         text
         type="error"
         class="mt-3 mb-2"
-        v-html="error"
       />
 
       <p
         v-if="note"
+        v-safe-html="note"
         class="mb-0"
-        v-html="note"
       />
     </v-card-text>
   </app-dialog>

@@ -72,7 +72,7 @@
               text
               class="mt-4 mb-0"
             >
-              <span v-html="$t('app.system_info.msg.canbus_warning')" />
+              <span v-safe-html="$t('app.system_info.msg.canbus_warning')" />
             </v-alert>
           </template>
 

@@ -75,7 +75,7 @@
         <template v-if="subTitle || hasSubTitleSlot">
           <v-card-subtitle class="py-2">
             <slot name="sub-title">
-              <span v-html="subTitle" />
+              <span v-safe-html="subTitle" />
             </slot>
           </v-card-subtitle>
 
@@ -96,7 +96,7 @@
         <template v-if="subTitle || hasSubTitleSlot">
           <v-card-subtitle class="py-2">
             <slot name="sub-title">
-              <span v-html="subTitle" />
+              <span v-safe-html="subTitle" />
             </slot>
           </v-card-subtitle>
 

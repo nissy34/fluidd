@@ -12,14 +12,10 @@ export const getters = {
   },
 
   getInstances: (state) => {
-    const instances = [
-      ...state.instances
-    ].sort((a, b) =>
-      a.active
-        ? -1
-        : (b.active ? 1 : a.name.localeCompare(b.name))
-    )
+    const instances = [...state.instances]
+
     return instances
+      .sort((a, b) => +b.active - +a.active || a.name.localeCompare(b.name))
   },
 
   /**

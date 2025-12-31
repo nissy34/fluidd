@@ -197,9 +197,10 @@ declare namespace Klipper {
     extrude_factor: number;
     absolute_coordinates: boolean;
     absolute_extrude: boolean;
-    homing_origin: [number, number, number, number];
-    position: [number, number, number, number];
-    gcode_position: [number, number, number, number];
+    homing_origin: [number, number, number];
+    position: [number, number, number, ...number[]];
+    gcode_position: [number, number, number, ...number[]];
+    axis_map?: Record<string, number>;
   }
 
   export interface IdleTimeoutState {
@@ -215,19 +216,20 @@ declare namespace Klipper {
 
   export interface ToolheadState {
     homed_axes: string;
-    axis_minimum: [number, number, number, number];
-    axis_maximum: [number, number, number, number];
+    axis_minimum: [number, number, number];
+    axis_maximum: [number, number, number];
     print_time: number;
     stalls: number;
     estimated_print_time: number;
     extruder: '' | ExtruderKey;
-    position: [number, number, number, number];
+    position: [number, number, number, ...number[]];
     max_velocity: number;
     max_accel: number;
     max_accel_to_decel?: number | null;
     minimum_cruise_ratio?: number | null;
     square_corner_velocity: number;
     cone_start_z?: number;
+    extra_axes?: Record<string, number>;
   }
 
   export interface WebhookState {
@@ -405,7 +407,7 @@ declare namespace Klipper {
   }
 
   export interface MotionReportState {
-    live_position: [number, number, number, number];
+    live_position: [number, number, number, ...number[]];
     live_velocity: number;
     live_extruder_velocity: number;
     steppers?: (`extruder_stepper ${string}` | `stepper_${string}` | ExtruderKey)[];
@@ -666,6 +668,8 @@ declare namespace Klipper {
     sync_drive: boolean;
     sync_feedback_state: string;
     sync_feedback_enabled: boolean;
+    sync_feedback_flow_rate: number;
+    sync_feedback_bias_modelled: number;
     clog_detection: number;
     clog_detection_enabled: number;
     endless_spool: number;
@@ -680,6 +684,15 @@ declare namespace Klipper {
     servo: string;
     grip?: string;
     sensors: Record<string, boolean | null>;
+    flowguard?: {
+      trigger: string;
+      reason: string;
+      level: number;
+      max_clog: number;
+      max_tangle: number;
+      active: boolean;
+      enabled: boolean;
+    };
     encoder?: {
       encoder_pos: number;
       detection_length: number;

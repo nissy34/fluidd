@@ -71,7 +71,7 @@ export const httpClientActions = {
   serverDatabaseItemGet<T = unknown> (namespace: string, key?: string, options?: AxiosRequestConfig) {
     return this.get<{
       result: Moonraker.Database.GetItemResponse<T>
-    }>(`/server/database/item?namespace=${namespace}&key=${key}`, options)
+    }>(`/server/database/item?namespace=${namespace}${key != null ? `&key=${key}` : ''}`, options)
   },
 
   serverDatabaseItemPost<T = unknown> (namespace: string, key: string, value: T, options?: AxiosRequestConfig) {

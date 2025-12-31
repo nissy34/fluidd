@@ -97,12 +97,7 @@ export default class ToolChangeCommands extends Mixins(StateMixin) {
           spoolId: macro?.variables?.spool_id ? +macro.variables.spool_id : undefined
         }
       })
-      .sort((a, b) => {
-        const numberA = parseInt(a.name.substring(1))
-        const numberB = parseInt(b.name.substring(1))
-
-        return numberA - numberB
-      })
+      .sort((a, b) => +a.name.substring(1) - +b.name.substring(1))
   }
 
   get toolChangeCommandsGrouped (): ToolChangeCommand[][] {

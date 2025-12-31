@@ -4,9 +4,9 @@
     align-center
   >
     <div
+      v-safe-html="label"
       class="text-body-1"
       :class="{ 'text--disabled': disabled }"
-      v-html="label"
     />
     <v-switch
       v-model="inputValue"

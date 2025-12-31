@@ -1130,7 +1130,6 @@ app:
       select: Виберіть
     label:
       spoolman_never: Ніколи
-      clog_detection: Виявлення засмічень
       tool_mapping: Відображення інструментів
       spoolman: Спулман
       spoolman_id: ID Спулмана
@@ -1164,6 +1163,7 @@ app:
       endless_spool: ES ∞
       filament_info: Інформація про нитки
       spoolman_days_ago: '%{days} днів тому'
+      clog_tangle_detection: Виявлення засмічення/заплутування
     msg:
       color: Колір
       select_gate: Виберіть інформацію про ворота/спул, яку ви бажаєте змінити
@@ -1241,7 +1241,7 @@ app:
     setting:
       show_details: Показати деталі нитки
       show_ttg_map: Показати карту ТТГ
-      show_clog_detection: Показати виявлення засмічення
+      show_clog_detection: Показати виявлення засмічення/заплутування
       show_logos: Показати логотипи
       large_filament_status: Статус великої нитки
       show_unavailable_spool_color: Показати недоступні спули

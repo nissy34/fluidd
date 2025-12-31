@@ -8,7 +8,7 @@
       bottom
       right
     >
-      <span v-html="$t('app.general.msg.needs_refresh')" />
+      <span v-safe-html="$t('app.general.msg.needs_refresh')" />
       <template #action="{ attrs }">
         <app-btn
           v-bind="attrs"

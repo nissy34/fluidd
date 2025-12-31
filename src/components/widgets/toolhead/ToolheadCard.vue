@@ -27,7 +27,7 @@
             $warning
           </v-icon>
         </template>
-        <span v-html="$t('app.general.label.disconnected')" />
+        <span>{{ $t('app.general.label.disconnected') }}</span>
       </v-tooltip>
 
       <v-tooltip
@@ -45,7 +45,7 @@
             $snowflakeAlert
           </v-icon>
         </template>
-        <span v-html="$t('app.tool.tooltip.extruder_disabled', { min: activeExtruder?.min_extrude_temp })" />
+        <span v-safe-html="$t('app.tool.tooltip.extruder_disabled', { min: activeExtruder?.min_extrude_temp })" />
       </v-tooltip>
     </template>
 

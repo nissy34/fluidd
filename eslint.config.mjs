@@ -26,8 +26,6 @@ export default defineConfigWithVueTs(
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       camelcase: 'off',
       'no-use-before-define': 'off',
-      'vue/no-v-html': 'off',
-      'vue/no-v-text-v-html-on-component': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-empty-object-type': 'off'
     }

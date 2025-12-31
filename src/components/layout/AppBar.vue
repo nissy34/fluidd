@@ -26,8 +26,8 @@
 
       <v-toolbar-title class="printer-title text--secondary">
         <router-link
+          v-safe-html="instanceName"
           :to="{ name: 'home' }"
-          v-html="instanceName"
         />
       </v-toolbar-title>
     </div>

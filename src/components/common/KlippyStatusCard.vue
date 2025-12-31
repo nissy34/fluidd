@@ -27,7 +27,7 @@
                 type="error"
                 class="ma-0"
               >
-                <span v-html="$t('app.general.error.printer_powered_off')" />
+                <span v-safe-html="$t('app.general.error.printer_powered_off')" />
               </v-alert>
             </v-col>
             <v-col
@@ -40,7 +40,7 @@
                 type="error"
                 class="ma-0"
               >
-                <span v-html="klippyStateMessage" />
+                <span v-safe-html="klippyStateMessage" />
               </v-alert>
             </v-col>
             <v-col

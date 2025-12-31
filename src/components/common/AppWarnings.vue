@@ -14,7 +14,7 @@
         <li
           v-for="(warning, index) in printerWarnings"
           :key="index"
-          v-html="linkExternalUrls(warning)"
+          v-safe-html="linkExternalUrls(warning)"
         />
       </ul>
     </template>
@@ -27,7 +27,7 @@
         <li
           v-for="(warning, index) in klipperWarnings"
           :key="index"
-          v-html="linkExternalUrls(warning.message)"
+          v-safe-html="linkExternalUrls(warning.message)"
         />
       </ul>
     </template>
@@ -40,7 +40,7 @@
         <li
           v-for="(failedComponent, index) in moonrakerFailedComponents"
           :key="index"
-          v-html="linkExternalUrls(failedComponent)"
+          v-safe-html="linkExternalUrls(failedComponent)"
         />
       </ul>
     </template>
@@ -53,16 +53,16 @@
         <li
           v-for="(warning, index) in moonrakerWarnings"
           :key="index"
-          v-html="linkExternalUrls(warning)"
+          v-safe-html="linkExternalUrls(warning)"
         />
       </ul>
     </template>
 
     <div v-if="printerWarnings.length > 0">
-      <span v-html="printerWarningsTxt" />
+      <span v-safe-html="printerWarningsTxt" />
     </div>
     <div v-if="moonrakerFailedComponents.length > 0">
-      <span v-html="moonrakerFailedComponentsTxt" />
+      <span v-safe-html="moonrakerFailedComponentsTxt" />
     </div>
   </v-alert>
 </template>

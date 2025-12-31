@@ -31,22 +31,22 @@ export const defaultState = (): PrinterState => {
         max_accel_to_decel: null,
         minimum_cruise_ratio: null,
         max_velocity: 0,
-        position: [0, 0, 0, 0],
-        axis_minimum: [0, 0, 0, 0],
-        axis_maximum: [0, 0, 0, 0],
+        position: [0, 0, 0],
+        axis_minimum: [0, 0, 0],
+        axis_maximum: [0, 0, 0],
         print_time: 0,
         square_corner_velocity: 0,
         extruder: '',
         stalls: 0
       },
       gcode_move: {
-        gcode_position: [0, 0, 0, 0],
-        homing_origin: [0, 0, 0, 0],
+        gcode_position: [0, 0, 0],
+        homing_origin: [0, 0, 0],
         speed: 0,
         absolute_coordinates: false,
         absolute_extrude: false,
         extrude_factor: 1,
-        position: [0, 0, 0, 0],
+        position: [0, 0, 0],
         speed_factor: 1
       },
       webhooks: {
