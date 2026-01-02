@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Ref } from 'vue-property-decorator'
+import { Component, Mixins, Ref, Prop, Watch } from 'vue-property-decorator'
 import StateMixin from '@/mixins/state'
 import { consola } from 'consola'
 
@@ -36,9 +36,13 @@ export default class U1Screen extends Mixins(StateMixin) {
   @Ref('screenIframe')
   readonly screenIframe!: HTMLIFrameElement
 
+  @Prop({ type: Boolean, default: false })
+  readonly collapsed!: boolean
+
   loading = true
   error: string | null = null
   screenUrl = ''
+  baseUrl = ''
 
   get apiUrl (): string {
     return this.$typedState.config.apiUrl
@@ -60,10 +64,31 @@ export default class U1Screen extends Mixins(StateMixin) {
   }
 
   mounted () {
-    this.screenUrl = this.buildScreenUrl()
-    if (!this.screenUrl) {
+    this.baseUrl = this.buildScreenUrl()
+    if (!this.baseUrl) {
       this.error = 'Failed to determine U1 screen server URL'
       this.loading = false
+    } else if (!this.collapsed) {
+      this.screenUrl = this.baseUrl
+    }
+  }
+
+  @Watch('collapsed')
+  onCollapsedChanged (collapsed: boolean) {
+    if (collapsed) {
+      // Stop all background calls by clearing the iframe src
+      this.screenUrl = ''
+      if (this.screenIframe) {
+        this.screenIframe.src = ''
+      }
+      this.loading = false
+      this.error = null
+    } else {
+      // Restore the iframe when expanded
+      if (this.baseUrl) {
+        this.loading = true
+        this.screenUrl = this.baseUrl
+      }
     }
   }
 
