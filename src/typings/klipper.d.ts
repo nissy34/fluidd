@@ -438,7 +438,8 @@ declare namespace Klipper {
   export interface ProbeState {
     name?: string;
     last_query: number;
-    last_z_result: number;
+    last_z_result?: number;
+    last_probe_position?: [number, number, number];
   }
 
   export interface PwmCycleTimeState {
@@ -680,10 +681,12 @@ declare namespace Klipper {
     spoolman_support: string;
     enable_spoolman: number;
     bowden_progress: number;
+    espooler: string[];
     espooler_active: string;
     servo: string;
     grip?: string;
     sensors: Record<string, boolean | null>;
+    drying_state?: string[];
     flowguard?: {
       trigger: string;
       reason: string;
@@ -727,9 +730,13 @@ declare namespace Klipper {
       variable_bowden_lengths: boolean;
       require_bowden_move: boolean;
       filament_always_gripped: boolean;
+      can_crossload: boolean;
       has_bypass: boolean;
       multi_gear: boolean;
       environment_sensor?: string;
+      filament_heater?: string;
+      environment_sensors?: string[];
+      filament_heaters?: string[];
     };
   }
 
@@ -938,6 +945,8 @@ declare namespace Klipper {
       load_cell: LoadCellSettings;
 
       [key: `load_cell ${Lowercase<string>}`]: LoadCellSettings;
+
+      [key: `static_pwm_clock ${Lowercase<string>}`]: StaticPwmClockSettings;
 
       // These keys are for kalico modules
 
@@ -1468,6 +1477,10 @@ declare namespace Klipper {
     pga_bypass?: boolean;
     input_mux?: string;
     vref?: string;
+  }
+
+  export interface StaticPwmClockSettings {
+    frequency: number;
   }
 
   export interface KalicoPrinterDangerOptionsSettings {

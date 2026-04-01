@@ -5,8 +5,8 @@ import { binarySearch, moveToSVGPath } from '@/util/gcode-preview'
 import isKeyOf from '@/util/is-key-of'
 
 const defaultColors = ['#1fb0ff', '#ff5252', '#D67600', '#830EE3', '#B366F2', '#E06573', '#E38819', '#795548', '#607D8B']
-const lightDefaultColors = ['#000', ...defaultColors]
-const darkDefaultColors = ['#FFF', ...defaultColors]
+const lightDefaultColors = Object.freeze(['#000', ...defaultColors])
+const darkDefaultColors = Object.freeze(['#FFF', ...defaultColors])
 
 export const getters = {
   getLayers: (state, getters, rootState): readonly Layer[] => {
@@ -120,10 +120,23 @@ export const getters = {
       z: NaN
     }
 
-    for (let i = moveIndex; i >= 0 && (Number.isNaN(output.x) || Number.isNaN(output.y) || Number.isNaN(output.z)); i--) {
+    for (let i = moveIndex, count = 0; i >= 0 && count < 3; i--) {
       const move = moves[i]
 
-      Object.assign(output, move)
+      if (Number.isNaN(output.x) && move.x != null) {
+        output.x = move.x
+        count++
+      }
+
+      if (Number.isNaN(output.y) && move.y != null) {
+        output.y = move.y
+        count++
+      }
+
+      if (Number.isNaN(output.z) && move.z != null) {
+        output.z = move.z
+        count++
+      }
     }
 
     return {
@@ -155,7 +168,7 @@ export const getters = {
     return []
   },
 
-  getDefaultColors: (state, getters, rootState) => {
+  getDefaultColors: (state, getters, rootState): readonly string[] => {
     return (
       rootState.config.uiSettings.theme.isDark
         ? darkDefaultColors
@@ -174,7 +187,7 @@ export const getters = {
           getters.getFileFilamentColors
         ]
 
-    const defaultColors: string[] = getters.getDefaultColors
+    const defaultColors: readonly string[] = getters.getDefaultColors
 
     const tools = toolIndexes
       .reduce<Record<Tool, string>>((tools, toolIndex, index) => {
@@ -285,7 +298,7 @@ export const getters = {
 
     const moves: readonly Move[] = state.moves
 
-    return binarySearch(moves, move => filePosition - move.filePosition)
+    return binarySearch(moves, move => filePosition - move.filePosition, true)
   },
 
   getLayerNrByFilePosition: (state, getters) => (filePosition: number): number => {
@@ -293,7 +306,7 @@ export const getters = {
       return 0
     }
 
-    const layers: Layer[] = getters.getLayers
+    const layers: readonly Layer[] = getters.getLayers
 
     const layer = binarySearch(layers, layer => filePosition - layer.filePosition, true)
 
